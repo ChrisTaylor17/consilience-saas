@@ -93,56 +93,91 @@ const Chat = ({ walletAddress, socket }) => {
     }
   };
 
-  const formatMessage = (message) => {
-    try {
-      const prefix = message.type === 'system' ? '[SYSTEM]' : 
-                    message.type === 'ai' ? '[AI_AGENT]' : 
-                    `[${message.sender?.slice(0, 8)}...]`;
-      
-      const timestamp = message.timestamp ? message.timestamp.toLocaleTimeString() : new Date().toLocaleTimeString();
-      
-      return `${timestamp} ${prefix}: ${message.content}`;
-    } catch (error) {
-      console.error('Format message error:', error);
-      return `[ERROR]: ${message.content || 'Invalid message'}`;
-    }
-  };
+
 
   return (
-    <div className="terminal-border h-full flex flex-col">
+    <div className="glass-panel h-full flex flex-col">
       {/* Messages Area */}
-      <div className="flex-1 p-4 overflow-y-auto">
+      <div className="flex-1 p-6 overflow-y-auto space-y-4">
         {messages.map((message) => (
-          <div key={message.id} className="mb-2 whitespace-pre-wrap">
-            {formatMessage(message)}
+          <div 
+            key={message.id} 
+            className={`p-4 rounded-lg ${
+              message.type === 'user' ? 'message-user ml-8' :
+              message.type === 'ai' ? 'message-ai mr-8' :
+              'message-system'
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                message.type === 'user' ? 'bg-blue-500' :
+                message.type === 'ai' ? 'bg-purple-500' :
+                'bg-green-500'
+              }`}>
+                {message.type === 'user' ? 'U' :
+                 message.type === 'ai' ? 'AI' : 'SYS'}
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-medium">
+                    {message.type === 'system' ? 'System' : 
+                     message.type === 'ai' ? 'AI Agent' : 
+                     `${message.sender?.slice(0, 8)}...`}
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    {message.timestamp ? message.timestamp.toLocaleTimeString() : new Date().toLocaleTimeString()}
+                  </span>
+                </div>
+                <div className="text-sm whitespace-pre-wrap leading-relaxed">
+                  {message.content}
+                </div>
+              </div>
+            </div>
           </div>
         ))}
         {isTyping && (
-          <div className="mb-2 opacity-75">
-            [AI_AGENT]: PROCESSING<span className="cursor"></span>
+          <div className="message-ai mr-8 p-4 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-xs font-bold">
+                AI
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm">AI Agent is thinking</span>
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-white p-4">
-        <div className="flex items-center">
-          <span className="mr-2">{'>'}</span>
+      <div className="border-t border-gray-700 p-4">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold">
+            U
+          </div>
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="flex-1 bg-transparent border-none outline-none text-white font-mono"
-            placeholder="TYPE YOUR MESSAGE..."
+            className="flex-1 bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 transition-colors"
+            placeholder="Type your message..."
             maxLength={500}
           />
           <button
             onClick={handleSendMessage}
-            className="ml-2 px-4 py-1 border border-white hover:bg-white hover:text-black transition-colors"
+            className="btn-primary"
+            disabled={!inputValue.trim()}
           >
-            SEND
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
           </button>
         </div>
       </div>
