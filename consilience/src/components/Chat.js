@@ -96,58 +96,36 @@ const Chat = ({ walletAddress, socket }) => {
 
 
   return (
-    <div className="glass-panel h-full flex flex-col">
+    <div className="retro-panel h-full flex flex-col">
       {/* Messages Area */}
-      <div className="flex-1 p-6 overflow-y-auto space-y-4">
+      <div className="flex-1 p-4 overflow-y-auto">
         {messages.map((message) => (
-          <div 
-            key={message.id} 
-            className={`p-4 rounded-lg ${
-              message.type === 'user' ? 'message-user ml-8' :
-              message.type === 'ai' ? 'message-ai mr-8' :
+          <div key={message.id} className="mb-2">
+            <div className={`p-2 ${
+              message.type === 'user' ? 'message-user' :
+              message.type === 'ai' ? 'message-ai' :
               'message-system'
-            }`}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                message.type === 'user' ? 'bg-blue-500' :
-                message.type === 'ai' ? 'bg-purple-500' :
-                'bg-green-500'
-              }`}>
-                {message.type === 'user' ? 'U' :
-                 message.type === 'ai' ? 'AI' : 'SYS'}
+            }`}>
+              <div className="text-xs mb-1 uppercase tracking-wide">
+                [{message.timestamp ? message.timestamp.toLocaleTimeString() : new Date().toLocaleTimeString()}] 
+                {message.type === 'system' ? '[SYSTEM]' : 
+                 message.type === 'ai' ? '[AI_AGENT]' : 
+                 `[${message.sender?.slice(0, 8)}...]`}
               </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-medium">
-                    {message.type === 'system' ? 'System' : 
-                     message.type === 'ai' ? 'AI Agent' : 
-                     `${message.sender?.slice(0, 8)}...`}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    {message.timestamp ? message.timestamp.toLocaleTimeString() : new Date().toLocaleTimeString()}
-                  </span>
-                </div>
-                <div className="text-sm whitespace-pre-wrap leading-relaxed">
-                  {message.content}
-                </div>
+              <div className="text-sm whitespace-pre-wrap font-mono">
+                {message.content}
               </div>
             </div>
           </div>
         ))}
         {isTyping && (
-          <div className="message-ai mr-8 p-4 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-xs font-bold">
-                AI
+          <div className="mb-2">
+            <div className="message-ai p-2">
+              <div className="text-xs mb-1 uppercase tracking-wide">
+                [{new Date().toLocaleTimeString()}] [AI_AGENT]
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm">AI Agent is thinking</span>
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                </div>
+              <div className="text-sm font-mono">
+                PROCESSING<span className="cursor"></span>
               </div>
             </div>
           </div>
@@ -156,28 +134,24 @@ const Chat = ({ walletAddress, socket }) => {
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-gray-700 p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold">
-            U
-          </div>
+      <div className="neon-border border-t p-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm neon-glow">></span>
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="flex-1 bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 transition-colors"
-            placeholder="Type your message..."
+            className="flex-1 retro-input p-2 text-sm font-mono uppercase"
+            placeholder="TYPE YOUR MESSAGE..."
             maxLength={500}
           />
           <button
             onClick={handleSendMessage}
-            className="btn-primary"
+            className="btn-retro text-xs"
             disabled={!inputValue.trim()}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
+            SEND
           </button>
         </div>
       </div>

@@ -16,51 +16,43 @@ const Terminal = () => {
   }, []);
 
   return (
-    <div className="min-h-screen p-6" style={{ background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)' }}>
+    <div className="min-h-screen bg-black p-4 scanlines">
       {/* Header */}
-      <div className="glass-panel glow-border p-6 mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              CONSILIENCE
-            </h1>
-            <p className="text-sm text-gray-400 mt-1">AI-Powered Blockchain Collaboration Platform</p>
-          </div>
-          <div className="text-right">
-            <div className="text-sm text-gray-400 mono">
-              {currentTime.toLocaleString()}
-            </div>
+      <div className="retro-panel p-4 mb-4">
+        <div className="flex justify-between items-center mb-2">
+          <h1 className="text-2xl font-bold neon-glow uppercase tracking-wider">
+            CONSILIENCE v1.0
+          </h1>
+          <div className="text-xs text-white">
+            {currentTime.toLocaleString()}
           </div>
         </div>
+        <div className="text-xs text-white mb-4 uppercase tracking-wide">
+          AI-POWERED BLOCKCHAIN COLLABORATION TERMINAL
+        </div>
         <div className="flex justify-between items-center">
-          <div className="flex items-center text-sm">
+          <div className="flex items-center text-xs uppercase">
             <span className={`status-indicator ${connected ? 'status-connected' : 'status-disconnected'}`}></span>
-            <span className="font-medium">
-              {connected ? 'Connected' : 'Disconnected'}
-            </span>
+            STATUS: {connected ? 'CONNECTED' : 'DISCONNECTED'}
           </div>
           <WalletMultiButton />
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex gap-6 h-[calc(100vh-200px)]">
+      <div className="flex gap-4 h-[calc(100vh-180px)]">
         {/* Chat Area */}
         <div className="flex-1">
           {connected ? (
             <Chat walletAddress={publicKey?.toString()} socket={socket} />
           ) : (
-            <div className="glass-panel h-full flex items-center justify-center">
+            <div className="retro-panel h-full flex items-center justify-center">
               <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
+                <div className="text-6xl mb-4 neon-glow">█</div>
+                <div className="text-lg mb-2 neon-glow uppercase tracking-wider">WALLET CONNECTION REQUIRED</div>
+                <div className="text-xs text-white mb-6 uppercase">
+                  CONNECT YOUR SOLANA WALLET TO ACCESS CONSILIENCE
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Wallet Connection Required</h3>
-                <p className="text-gray-400 mb-6">
-                  Connect your Solana wallet to access the collaboration platform
-                </p>
                 <WalletMultiButton />
               </div>
             </div>
