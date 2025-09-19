@@ -22,10 +22,8 @@ const Chat = ({ walletAddress, socket }) => {
     // Socket event listeners
     if (socket) {
       const handleMessage = (message) => {
-        // Only add messages from other users, not our own
-        if (message.sender !== walletAddress) {
-          setMessages(prev => [...prev, message]);
-        }
+        // Add all messages from socket (these are from other users)
+        setMessages(prev => [...prev, message]);
       };
 
       const handleUserJoined = (data) => {
@@ -56,26 +54,28 @@ const Chat = ({ walletAddress, socket }) => {
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
+    const messageContent = inputValue;
     const userMessage = {
       id: Date.now(),
       sender: walletAddress,
-      content: inputValue,
+      content: messageContent,
       timestamp: new Date(),
       type: 'user'
     };
 
+    // Add message locally first
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsTyping(true);
 
-    // Emit to socket
+    // Emit to socket for other users
     if (socket) {
       socket.emit('message', userMessage);
     }
 
     // Process AI response
     try {
-      const aiResponse = await aiService.processMessage(inputValue, walletAddress);
+      const aiResponse = await aiService.processMessage(messageContent, walletAddress);
       
       const aiMessage = {
         id: Date.now() + 1,
