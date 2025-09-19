@@ -21,11 +21,14 @@ const Chat = ({ walletAddress, socket }) => {
 
     // Socket event listeners
     if (socket) {
-      socket.on('message', (message) => {
-        setMessages(prev => [...prev, message]);
-      });
+      const handleMessage = (message) => {
+        // Only add messages from other users, not our own
+        if (message.sender !== walletAddress) {
+          setMessages(prev => [...prev, message]);
+        }
+      };
 
-      socket.on('user_joined', (data) => {
+      const handleUserJoined = (data) => {
         const joinMessage = {
           id: Date.now(),
           sender: 'SYSTEM',
@@ -34,15 +37,16 @@ const Chat = ({ walletAddress, socket }) => {
           type: 'system'
         };
         setMessages(prev => [...prev, joinMessage]);
-      });
-    }
+      };
 
-    return () => {
-      if (socket) {
-        socket.off('message');
-        socket.off('user_joined');
-      }
-    };
+      socket.on('message', handleMessage);
+      socket.on('user_joined', handleUserJoined);
+
+      return () => {
+        socket.off('message', handleMessage);
+        socket.off('user_joined', handleUserJoined);
+      };
+    }
   }, [walletAddress, socket]);
 
   useEffect(() => {
