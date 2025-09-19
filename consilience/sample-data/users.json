@@ -1,0 +1,32 @@
+[
+  {
+    "walletAddress": "7KJ9X2M4P8Q1R5S6T3U9V2W7Y4Z1A8B5C6D3E9F2G7H4",
+    "skills": ["Rust", "Solana", "Smart Contracts", "DeFi"],
+    "interests": ["Blockchain Development", "Decentralized Finance", "Web3"],
+    "experience": "EXPERT",
+    "projects": [],
+    "tokensEarned": 0,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "lastActive": "2024-01-15T10:30:00.000Z"
+  },
+  {
+    "walletAddress": "9PL2Y5N8K4M7Q1R3S6T9U2V5W8X1A4B7C0D3E6F9G2H5",
+    "skills": ["React", "TypeScript", "UI/UX Design", "Frontend"],
+    "interests": ["User Experience", "Web Development", "Design Systems"],
+    "experience": "INTERMEDIATE",
+    "projects": [],
+    "tokensEarned": 0,
+    "createdAt": "2024-01-02T00:00:00.000Z",
+    "lastActive": "2024-01-15T09:15:00.000Z"
+  },
+  {
+    "walletAddress": "4RT6Z1Q3M8N5P2S7T0U3V6W9X2Y5A8B1C4D7E0F3G6H9",
+    "skills": ["Product Management", "Strategy", "Team Leadership", "Agile"],
+    "interests": ["Project Management", "Team Coordination", "Business Strategy"],
+    "experience": "EXPERT",
+    "projects": [],
+    "tokensEarned": 0,
+    "createdAt": "2024-01-03T00:00:00.000Z",
+    "lastActive": "2024-01-15T11:45:00.000Z"
+  }
+]
