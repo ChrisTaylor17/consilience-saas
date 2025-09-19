@@ -19,40 +19,11 @@ const Chat = ({ walletAddress, socket }) => {
     };
     setMessages([welcomeMessage]);
 
-    // Socket event listeners
+    // Temporarily disable socket listeners to fix duplication
+    // TODO: Re-enable for multi-user chat once fixed
     if (socket) {
-      const handleMessage = (message) => {
-        try {
-          if (message && message.content && message.sender !== walletAddress) {
-            setMessages(prev => [...prev, message]);
-          }
-        } catch (error) {
-          console.error('Handle message error:', error);
-        }
-      };
-
-      const handleUserJoined = (data) => {
-        try {
-          const joinMessage = {
-            id: Date.now(),
-            sender: 'SYSTEM',
-            content: `USER ${data.walletAddress?.slice(0, 8) || 'UNKNOWN'}... JOINED THE SESSION`,
-            timestamp: new Date(),
-            type: 'system'
-          };
-          setMessages(prev => [...prev, joinMessage]);
-        } catch (error) {
-          console.error('Handle user joined error:', error);
-        }
-      };
-
-      socket.on('message', handleMessage);
-      socket.on('user_joined', handleUserJoined);
       socket.on('error', (error) => console.error('Socket error:', error));
-
       return () => {
-        socket.off('message', handleMessage);
-        socket.off('user_joined', handleUserJoined);
         socket.off('error');
       };
     }
@@ -80,10 +51,8 @@ const Chat = ({ walletAddress, socket }) => {
       setInputValue('');
       setIsTyping(true);
 
-      // Emit to socket for other users
-      if (socket && socket.connected) {
-        socket.emit('message', userMessage);
-      }
+      // Temporarily disable socket emit to fix duplication
+      // TODO: Re-enable for multi-user chat once fixed
 
       // Only process AI response for the sender, not all users
       try {
