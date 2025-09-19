@@ -23,7 +23,7 @@ const Chat = ({ walletAddress, socket }) => {
     if (socket) {
       const handleMessage = (message) => {
         try {
-          if (message && message.content) {
+          if (message && message.content && message.sender !== walletAddress) {
             setMessages(prev => [...prev, message]);
           }
         } catch (error) {
@@ -85,7 +85,7 @@ const Chat = ({ walletAddress, socket }) => {
         socket.emit('message', userMessage);
       }
 
-      // Process AI response
+      // Only process AI response for the sender, not all users
       try {
         const aiResponse = await aiService.processMessage(messageContent, walletAddress);
         
@@ -98,10 +98,6 @@ const Chat = ({ walletAddress, socket }) => {
         };
 
         setMessages(prev => [...prev, aiMessage]);
-        
-        if (socket && socket.connected) {
-          socket.emit('message', aiMessage);
-        }
       } catch (error) {
         console.error('AI response error:', error);
         const errorMessage = {
