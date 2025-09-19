@@ -22,27 +22,38 @@ const Chat = ({ walletAddress, socket }) => {
     // Socket event listeners
     if (socket) {
       const handleMessage = (message) => {
-        // Add all messages from socket (these are from other users)
-        setMessages(prev => [...prev, message]);
+        try {
+          if (message && message.content) {
+            setMessages(prev => [...prev, message]);
+          }
+        } catch (error) {
+          console.error('Handle message error:', error);
+        }
       };
 
       const handleUserJoined = (data) => {
-        const joinMessage = {
-          id: Date.now(),
-          sender: 'SYSTEM',
-          content: `USER ${data.walletAddress.slice(0, 8)}... JOINED THE SESSION`,
-          timestamp: new Date(),
-          type: 'system'
-        };
-        setMessages(prev => [...prev, joinMessage]);
+        try {
+          const joinMessage = {
+            id: Date.now(),
+            sender: 'SYSTEM',
+            content: `USER ${data.walletAddress?.slice(0, 8) || 'UNKNOWN'}... JOINED THE SESSION`,
+            timestamp: new Date(),
+            type: 'system'
+          };
+          setMessages(prev => [...prev, joinMessage]);
+        } catch (error) {
+          console.error('Handle user joined error:', error);
+        }
       };
 
       socket.on('message', handleMessage);
       socket.on('user_joined', handleUserJoined);
+      socket.on('error', (error) => console.error('Socket error:', error));
 
       return () => {
         socket.off('message', handleMessage);
         socket.off('user_joined', handleUserJoined);
+        socket.off('error');
       };
     }
   }, [walletAddress, socket]);
@@ -52,47 +63,60 @@ const Chat = ({ walletAddress, socket }) => {
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
-
-    const messageContent = inputValue;
-    const userMessage = {
-      id: Date.now(),
-      sender: walletAddress,
-      content: messageContent,
-      timestamp: new Date(),
-      type: 'user'
-    };
-
-    // Add message locally first
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
-    setIsTyping(true);
-
-    // Emit to socket for other users
-    if (socket) {
-      socket.emit('message', userMessage);
-    }
-
-    // Process AI response
     try {
-      const aiResponse = await aiService.processMessage(messageContent, walletAddress);
-      
-      const aiMessage = {
-        id: Date.now() + 1,
-        sender: 'AI_AGENT',
-        content: aiResponse,
+      if (!inputValue.trim()) return;
+
+      const messageContent = inputValue;
+      const userMessage = {
+        id: Date.now(),
+        sender: walletAddress,
+        content: messageContent,
         timestamp: new Date(),
-        type: 'ai'
+        type: 'user'
       };
 
-      setMessages(prev => [...prev, aiMessage]);
-      
-      if (socket) {
-        socket.emit('message', aiMessage);
+      // Add message locally first
+      setMessages(prev => [...prev, userMessage]);
+      setInputValue('');
+      setIsTyping(true);
+
+      // Emit to socket for other users
+      if (socket && socket.connected) {
+        socket.emit('message', userMessage);
+      }
+
+      // Process AI response
+      try {
+        const aiResponse = await aiService.processMessage(messageContent, walletAddress);
+        
+        const aiMessage = {
+          id: Date.now() + 1,
+          sender: 'AI_AGENT',
+          content: aiResponse,
+          timestamp: new Date(),
+          type: 'ai'
+        };
+
+        setMessages(prev => [...prev, aiMessage]);
+        
+        if (socket && socket.connected) {
+          socket.emit('message', aiMessage);
+        }
+      } catch (error) {
+        console.error('AI response error:', error);
+        const errorMessage = {
+          id: Date.now() + 1,
+          sender: 'AI_AGENT',
+          content: 'ERROR: AI SERVICE UNAVAILABLE',
+          timestamp: new Date(),
+          type: 'ai'
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      } finally {
+        setIsTyping(false);
       }
     } catch (error) {
-      console.error('AI response error:', error);
-    } finally {
+      console.error('Message send error:', error);
       setIsTyping(false);
     }
   };
@@ -105,13 +129,18 @@ const Chat = ({ walletAddress, socket }) => {
   };
 
   const formatMessage = (message) => {
-    const prefix = message.type === 'system' ? '[SYSTEM]' : 
-                  message.type === 'ai' ? '[AI_AGENT]' : 
-                  `[${message.sender?.slice(0, 8)}...]`;
-    
-    const timestamp = message.timestamp.toLocaleTimeString();
-    
-    return `${timestamp} ${prefix}: ${message.content}`;
+    try {
+      const prefix = message.type === 'system' ? '[SYSTEM]' : 
+                    message.type === 'ai' ? '[AI_AGENT]' : 
+                    `[${message.sender?.slice(0, 8)}...]`;
+      
+      const timestamp = message.timestamp ? message.timestamp.toLocaleTimeString() : new Date().toLocaleTimeString();
+      
+      return `${timestamp} ${prefix}: ${message.content}`;
+    } catch (error) {
+      console.error('Format message error:', error);
+      return `[ERROR]: ${message.content || 'Invalid message'}`;
+    }
   };
 
   return (
