@@ -4,13 +4,29 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import Chat from './Chat';
 import WalletInfo from './WalletInfo';
 import ChannelSidebar from './ChannelSidebar';
+import UserProfileModal from './UserProfileModal';
 import { useSocket } from '../hooks/useSocket';
 
 const Terminal = () => {
   const { connected, publicKey } = useWallet();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentChannel, setCurrentChannel] = useState({ id: 'general', name: 'general', description: 'Main discussion' });
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
   const socket = useSocket();
+
+  // Check if user has a profile
+  useEffect(() => {
+    if (connected && publicKey) {
+      const savedProfile = localStorage.getItem(`profile_${publicKey.toString()}`);
+      if (savedProfile) {
+        setUserProfile(JSON.parse(savedProfile));
+      } else {
+        // Show profile modal for new users
+        setTimeout(() => setShowProfileModal(true), 2000);
+      }
+    }
+  }, [connected, publicKey]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -70,7 +86,17 @@ const Terminal = () => {
                   )}
                   <h2 className="text-lg font-medium">{currentChannel?.name}</h2>
                 </div>
-                <p className="text-sm text-white/60 mt-1">{currentChannel?.description}</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-white/60">{currentChannel?.description}</p>
+                  {!userProfile && (
+                    <button
+                      onClick={() => setShowProfileModal(true)}
+                      className="text-xs btn-minimal px-3 py-1"
+                    >
+                      Complete Profile
+                    </button>
+                  )}
+                </div>
               </div>
               
               {/* Chat Component */}
@@ -105,6 +131,14 @@ const Terminal = () => {
           </div>
         )}
       </div>
+
+      {/* Profile Modal */}
+      <UserProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        walletAddress={publicKey?.toString()}
+        onSave={(profile) => setUserProfile(profile)}
+      />
     </div>
   );
 };

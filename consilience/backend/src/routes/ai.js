@@ -10,10 +10,7 @@ const openai = new OpenAI({
 // Chat endpoint
 router.post('/chat', async (req, res) => {
   try {
-    const { message, walletAddress } = req.body;
-
-    // Skip user profile for now (no AWS credentials)
-    const userProfile = null;
+    const { message, walletAddress, userProfile } = req.body;
     
     // Call OpenAI API
     console.log('Calling OpenAI with message:', message);
@@ -23,11 +20,11 @@ router.post('/chat', async (req, res) => {
       messages: [
         {
           role: "system",
-          content: "You are an AI agent for CONSILIENCE, a blockchain collaboration platform. Help users with blockchain development, team collaboration, and Solana ecosystem questions. Keep responses conversational and helpful."
+          content: "You are an AI agent for CONSILIENCE, a blockchain collaboration platform. Help users with blockchain development, team collaboration, and Solana ecosystem questions. Use their profile information to give personalized recommendations for projects and team matches. Keep responses conversational and helpful."
         },
         {
           role: "user",
-          content: `User wallet: ${walletAddress}\nMessage: ${message}`
+          content: `User wallet: ${walletAddress}\nUser profile: ${userProfile ? JSON.stringify(userProfile) : 'No profile available'}\nMessage: ${message}`
         }
       ],
       max_tokens: 300,

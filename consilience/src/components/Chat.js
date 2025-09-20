@@ -133,7 +133,7 @@ const Chat = ({ walletAddress, socket, currentChannel }) => {
       if (currentChannel?.isAI) {
         // AI Channel - always get AI response
         try {
-          const aiResponse = await aiService.processMessage(`/ai ${messageContent}`, walletAddress);
+          const aiResponse = await aiService.processMessage(messageContent, walletAddress, true);
           
           if (aiResponse) {
             const aiMessage = {
@@ -154,7 +154,7 @@ const Chat = ({ walletAddress, socket, currentChannel }) => {
       } else {
         // Public Channel - emit to other users and check for AI commands
         if (socket && socket.connected) {
-          socket.emit('message', { ...userMessage, channel: currentChannel.id });
+          socket.emit('message', { message: userMessage, channel: currentChannel.id });
         }
 
         // Check if message was directed to AI

@@ -5,19 +5,23 @@ class AIService {
     this.apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
   }
 
-  async processMessage(message, walletAddress) {
+  async processMessage(message, walletAddress, isAIChannel = false) {
     try {
-      // Only process messages that start with /ai or @ai
-      if (!message.toLowerCase().startsWith('/ai ') && !message.toLowerCase().startsWith('@ai ')) {
+      // In AI channel, process all messages. In public channels, only /ai or @ai
+      if (!isAIChannel && !message.toLowerCase().startsWith('/ai ') && !message.toLowerCase().startsWith('@ai ')) {
         return null; // Don't respond to regular chat messages
       }
 
-      // Remove the /ai or @ai prefix
+      // Remove the /ai or @ai prefix if present
       const cleanMessage = message.replace(/^(\/ai |@ai )/i, '').trim();
+      
+      // Get user profile for personalized responses
+      const userProfile = this.getUserProfile(walletAddress);
       
       const response = await axios.post(`${this.apiUrl}/ai/chat`, {
         message: cleanMessage,
         walletAddress,
+        userProfile,
         timestamp: new Date().toISOString()
       });
 
@@ -25,6 +29,34 @@ class AIService {
     } catch (error) {
       console.error('AI Service Error:', error);
       return 'Unable to process request. Please check connection.';
+    }
+  }
+
+  getUserProfile(walletAddress) {
+    try {
+      const profile = localStorage.getItem(`profile_${walletAddress}`);
+      return profile ? JSON.parse(profile) : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async findMatches(walletAddress) {
+    try {
+      const userProfile = this.getUserProfile(walletAddress);
+      if (!userProfile) {
+        return 'Please complete your profile first to find matches.';
+      }
+
+      const response = await axios.post(`${this.apiUrl}/ai/find-matches`, {
+        walletAddress,
+        userProfile
+      });
+
+      return response.data.matches || [];
+    } catch (error) {
+      console.error('Find matches error:', error);
+      return [];
     }
   }
 
