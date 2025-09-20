@@ -18,6 +18,7 @@ const SimpleChat = ({ walletAddress, socket }) => {
   }, [socket, walletAddress]);
 
   const sendMessage = async () => {
+    console.log('Send message called with input:', input);
     if (!input.trim()) return;
 
     const userMessage = {
@@ -28,45 +29,63 @@ const SimpleChat = ({ walletAddress, socket }) => {
       type: 'user'
     };
 
+    console.log('Adding user message:', userMessage);
     setMessages(prev => [...prev, userMessage]);
 
     // Broadcast to others
     if (socket) {
-      console.log('CLIENT: Sending user message:', userMessage);
+      console.log('CLIENT: Sending user message via socket:', userMessage);
       socket.emit('message', { message: userMessage, channel: 'general' });
+    } else {
+      console.log('No socket connection!');
     }
 
     // Get AI response if starts with /ai
-    if (input.startsWith('/ai ')) {
+    if (input.toLowerCase().startsWith('/ai ')) {
+      console.log('AI request detected, calling API...');
       try {
+        const apiCall = {
+          message: input.replace('/ai ', ''),
+          walletAddress
+        };
+        console.log('API call data:', apiCall);
+        
         const response = await fetch('https://consilience-saas-production.up.railway.app/api/ai/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: input.replace('/ai ', ''),
-            walletAddress
-          })
+          body: JSON.stringify(apiCall)
         });
         
+        console.log('API response status:', response.status);
         const result = await response.json();
+        console.log('API result:', result);
         
         const aiMessage = {
           id: Date.now() + 1,
           sender: 'AI_AGENT',
-          content: result.response,
+          content: result.response || 'No response from AI',
           timestamp: new Date(),
           type: 'ai'
         };
 
+        console.log('Adding AI message:', aiMessage);
         setMessages(prev => [...prev, aiMessage]);
         
         // Broadcast AI response to ALL users
         if (socket) {
-          console.log('CLIENT: Broadcasting AI message:', aiMessage);
+          console.log('CLIENT: Broadcasting AI message via socket:', aiMessage);
           socket.emit('message', { message: aiMessage, channel: 'general' });
         }
       } catch (error) {
-        console.error('AI error:', error);
+        console.error('AI API error:', error);
+        const errorMessage = {
+          id: Date.now() + 2,
+          sender: 'AI_AGENT',
+          content: 'Error connecting to AI service',
+          timestamp: new Date(),
+          type: 'ai'
+        };
+        setMessages(prev => [...prev, errorMessage]);
       }
     }
 
