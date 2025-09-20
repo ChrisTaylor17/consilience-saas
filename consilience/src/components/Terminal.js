@@ -6,6 +6,8 @@ import WalletInfo from './WalletInfo';
 import ChannelSidebar from './ChannelSidebar';
 import UserProfileModal from './UserProfileModal';
 import ProjectModal from './ProjectModal';
+import ProjectBrowser from './ProjectBrowser';
+import TaskManager from './TaskManager';
 import { useSocket } from '../hooks/useSocket';
 import { projectService } from '../services/projectService';
 
@@ -15,8 +17,10 @@ const Terminal = () => {
   const [currentChannel, setCurrentChannel] = useState({ id: 'general', name: 'general', description: 'Main discussion' });
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showProjectModal, setShowProjectModal] = useState(false);
+  const [showProjectBrowser, setShowProjectBrowser] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [userProjects, setUserProjects] = useState([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const socket = useSocket();
 
   // Check if user has a profile and load projects
@@ -37,10 +41,10 @@ const Terminal = () => {
       const projects = projectService.getUserProjects(walletAddress);
       setUserProjects(projects);
     }
-  }, [connected, publicKey]);
+  }, [connected, publicKey, refreshTrigger]);
 
   const handleProjectCreated = (project) => {
-    setUserProjects(prev => [...prev, project]);
+    setRefreshTrigger(prev => prev + 1);
     
     // Switch to the new project channel
     const projectChannel = {
@@ -51,6 +55,25 @@ const Terminal = () => {
       project: project
     };
     setCurrentChannel(projectChannel);
+  };
+
+  const handleJoinProject = (project) => {
+    setRefreshTrigger(prev => prev + 1);
+    setShowProjectBrowser(false);
+    
+    // Switch to the joined project channel
+    const projectChannel = {
+      id: project.channelId,
+      name: project.name,
+      description: `${project.type} • ${project.members.length}/${project.teamSize} members`,
+      isProject: true,
+      project: project
+    };
+    setCurrentChannel(projectChannel);
+  };
+
+  const handleTaskUpdate = () => {
+    setRefreshTrigger(prev => prev + 1);
   };
 
   useEffect(() => {
@@ -94,6 +117,7 @@ const Terminal = () => {
             walletAddress={publicKey?.toString()}
             userProjects={userProjects}
             onCreateProject={() => setShowProjectModal(true)}
+            onBrowseProjects={() => setShowProjectBrowser(true)}
           />
         )}
 
@@ -108,31 +132,71 @@ const Terminal = () => {
                     <div className="w-6 h-6 rounded-full bg-gradient-to-r from-white/20 to-white/10 flex items-center justify-center">
                       <span className="text-xs">AI</span>
                     </div>
+                  ) : currentChannel?.isProject ? (
+                    <span className="text-white/40">🚀</span>
                   ) : (
                     <span className="text-white/40">#</span>
                   )}
                   <h2 className="text-lg font-medium">{currentChannel?.name}</h2>
+                  {currentChannel?.isProject && (
+                    <span className="text-xs px-2 py-1 bg-white/10 rounded">
+                      {currentChannel.project?.status}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-white/60">{currentChannel?.description}</p>
-                  {!userProfile && (
-                    <button
-                      onClick={() => setShowProfileModal(true)}
-                      className="text-xs btn-minimal px-3 py-1"
-                    >
-                      Complete Profile
-                    </button>
-                  )}
+                  <div className="flex gap-2">
+                    {!userProfile && (
+                      <button
+                        onClick={() => setShowProfileModal(true)}
+                        className="text-xs btn-minimal px-3 py-1"
+                      >
+                        Complete Profile
+                      </button>
+                    )}
+                    {currentChannel?.isProject && (
+                      <button
+                        onClick={() => setShowProjectBrowser(true)}
+                        className="text-xs btn-minimal px-3 py-1"
+                      >
+                        Browse Projects
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
               
-              {/* Chat Component */}
-              <div className="flex-1">
-                <Chat 
-                  walletAddress={publicKey?.toString()} 
-                  socket={socket} 
-                  currentChannel={currentChannel}
-                />
+              {/* Main Content Area */}
+              <div className="flex-1 flex">
+                {/* Chat Component */}
+                <div className="flex-1">
+                  {showProjectBrowser ? (
+                    <div className="p-6">
+                      <ProjectBrowser 
+                        walletAddress={publicKey?.toString()}
+                        onJoinProject={handleJoinProject}
+                      />
+                    </div>
+                  ) : (
+                    <Chat 
+                      walletAddress={publicKey?.toString()} 
+                      socket={socket} 
+                      currentChannel={currentChannel}
+                    />
+                  )}
+                </div>
+                
+                {/* Project Task Panel */}
+                {currentChannel?.isProject && !showProjectBrowser && (
+                  <div className="w-80 border-l border-white/10 p-4">
+                    <TaskManager 
+                      project={currentChannel.project}
+                      walletAddress={publicKey?.toString()}
+                      onTaskUpdate={handleTaskUpdate}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           ) : (

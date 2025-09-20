@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ChannelSidebar = ({ currentChannel, onChannelChange, walletAddress, userProjects, onCreateProject }) => {
+const ChannelSidebar = ({ currentChannel, onChannelChange, walletAddress, userProjects, onCreateProject, onBrowseProjects }) => {
   const channels = [
     { id: 'general', name: 'general', description: 'Main discussion' },
     { id: 'project-ideas', name: 'project-ideas', description: 'Brainstorm projects' },
@@ -23,6 +23,18 @@ const ChannelSidebar = ({ currentChannel, onChannelChange, walletAddress, userPr
       
       {/* Public Channels */}
       <div className="space-y-1 mb-6">
+        <button
+          onClick={onBrowseProjects}
+          className="w-full text-left p-3 rounded transition-colors text-white/60 hover:text-white/80 hover:bg-white/5 border border-white/20 mb-2"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-white/40">🔍</span>
+            <div>
+              <div className="text-sm font-medium">Browse Projects</div>
+              <div className="text-xs text-white/40">Discover & join projects</div>
+            </div>
+          </div>
+        </button>
         {channels.map((channel) => (
           <button
             key={channel.id}

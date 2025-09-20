@@ -1,19 +1,46 @@
 class ProjectService {
   constructor() {
     this.projects = this.loadProjects();
+    this.initBroadcastChannel();
   }
 
   loadProjects() {
     try {
-      const saved = localStorage.getItem('consilience_projects');
-      return saved ? JSON.parse(saved) : {};
+      // Try to load from shared storage first, then fallback to local
+      const shared = localStorage.getItem('consilience_shared_projects');
+      const local = localStorage.getItem('consilience_projects');
+      
+      const sharedProjects = shared ? JSON.parse(shared) : {};
+      const localProjects = local ? JSON.parse(local) : {};
+      
+      // Merge both storages
+      return { ...localProjects, ...sharedProjects };
     } catch (error) {
       return {};
     }
   }
 
   saveProjects() {
+    // Save to both local and shared storage
     localStorage.setItem('consilience_projects', JSON.stringify(this.projects));
+    localStorage.setItem('consilience_shared_projects', JSON.stringify(this.projects));
+    
+    // Broadcast project update to other users
+    if (window.broadcastChannel) {
+      window.broadcastChannel.postMessage({ type: 'projects_updated', projects: this.projects });
+    }
+  }
+
+  initBroadcastChannel() {
+    if (typeof BroadcastChannel !== 'undefined') {
+      window.broadcastChannel = new BroadcastChannel('consilience_projects');
+      window.broadcastChannel.onmessage = (event) => {
+        if (event.data.type === 'projects_updated') {
+          this.projects = { ...this.projects, ...event.data.projects };
+          localStorage.setItem('consilience_shared_projects', JSON.stringify(event.data.projects));
+        }
+      };
+    }
   }
 
   createProject(projectData) {
