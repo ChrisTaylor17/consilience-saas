@@ -1,0 +1,51 @@
+[
+  {
+    "projectId": "proj_001",
+    "name": "DEFI YIELD OPTIMIZER",
+    "description": "AUTOMATED YIELD FARMING PROTOCOL ON SOLANA",
+    "creatorWallet": "7KJ9X2M4P8Q1R5S6T3U9V2W7Y4Z1A8B5C6D3E9F2G7H4",
+    "teamMembers": [
+      "7KJ9X2M4P8Q1R5S6T3U9V2W7Y4Z1A8B5C6D3E9F2G7H4",
+      "9PL2Y5N8K4M7Q1R3S6T9U2V5W8X1A4B7C0D3E6F9G2H5"
+    ],
+    "projectType": "DEFI",
+    "status": "ACTIVE",
+    "tasks": [
+      {
+        "taskId": "task_001",
+        "title": "SMART CONTRACT DEVELOPMENT",
+        "description": "DEVELOP CORE YIELD FARMING CONTRACTS",
+        "assignedTo": "7KJ9X2M4P8Q1R5S6T3U9V2W7Y4Z1A8B5C6D3E9F2G7H4",
+        "tokenReward": 100,
+        "status": "IN_PROGRESS",
+        "createdAt": "2024-01-10T00:00:00.000Z"
+      },
+      {
+        "taskId": "task_002",
+        "title": "FRONTEND INTERFACE",
+        "description": "BUILD USER INTERFACE FOR YIELD FARMING",
+        "assignedTo": "9PL2Y5N8K4M7Q1R3S6T9U2V5W8X1A4B7C0D3E6F9G2H5",
+        "tokenReward": 75,
+        "status": "PENDING",
+        "createdAt": "2024-01-10T00:00:00.000Z"
+      }
+    ],
+    "tokenAllocations": {},
+    "createdAt": "2024-01-10T00:00:00.000Z"
+  },
+  {
+    "projectId": "proj_002",
+    "name": "NFT MARKETPLACE",
+    "description": "DECENTRALIZED NFT TRADING PLATFORM",
+    "creatorWallet": "4RT6Z1Q3M8N5P2S7T0U3V6W9X2Y5A8B1C4D7E0F3G6H9",
+    "teamMembers": [
+      "4RT6Z1Q3M8N5P2S7T0U3V6W9X2Y5A8B1C4D7E0F3G6H9",
+      "9PL2Y5N8K4M7Q1R3S6T9U2V5W8X1A4B7C0D3E6F9G2H5"
+    ],
+    "projectType": "NFT",
+    "status": "PLANNING",
+    "tasks": [],
+    "tokenAllocations": {},
+    "createdAt": "2024-01-12T00:00:00.000Z"
+  }
+]

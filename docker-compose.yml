@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:3001/api
+      - REACT_APP_WEBSOCKET_URL=ws://localhost:3001
+      - REACT_APP_SOLANA_RPC_URL=https://api.devnet.solana.com
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - AWS_REGION=us-east-1
+      - DYNAMODB_USERS_TABLE=consilience-users-local
+      - DYNAMODB_PROJECTS_TABLE=consilience-projects-local
+      - DYNAMODB_CHATS_TABLE=consilience-chats-local
+      - SOLANA_RPC_URL=https://api.devnet.solana.com
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - dynamodb-local
+
+  dynamodb-local:
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
