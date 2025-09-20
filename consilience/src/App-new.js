@@ -93,6 +93,7 @@ const AppNew = () => {
   };
 
   const createProject = () => {
+    console.log('Creating project:', newProjectName);
     if (!newProjectName.trim()) return;
     
     const project = {
@@ -104,7 +105,12 @@ const AppNew = () => {
       messages: []
     };
     
-    setProjects(prev => [...prev, project]);
+    console.log('New project:', project);
+    setProjects(prev => {
+      const updated = [...prev, project];
+      console.log('Updated projects:', updated);
+      return updated;
+    });
     setCurrentProject(project);
     setNewProjectName('');
     setShowCreateProject(false);
@@ -169,17 +175,22 @@ const AppNew = () => {
                 >
                   # General
                 </div>
-                {projects.map(project => (
-                  <div 
-                    key={project.id}
-                    onClick={() => joinProject(project)}
-                    className={`p-2 border border-white/20 rounded cursor-pointer text-sm ${
-                      currentProject?.id === project.id ? 'bg-white/10' : 'hover:bg-white/5'
-                    }`}
-                  >
-                    🚀 {project.name}
-                  </div>
-                ))}
+                {projects.length === 0 ? (
+                  <div className="text-xs text-white/60 p-2">No projects yet</div>
+                ) : (
+                  projects.map(project => (
+                    <div 
+                      key={project.id}
+                      onClick={() => joinProject(project)}
+                      className={`p-2 border border-white/20 rounded cursor-pointer text-sm ${
+                        currentProject?.id === project.id ? 'bg-white/10' : 'hover:bg-white/5'
+                      }`}
+                    >
+                      🚀 {project.name}
+                    </div>
+                  ))
+                )}
+                <div className="text-xs text-white/40 mt-2">Projects: {projects.length}</div>
               </div>
             </div>
 
