@@ -16,51 +16,46 @@ const Terminal = () => {
   }, []);
 
   return (
-    <div className="min-h-screen p-6" style={{ background: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 25%, #fecfef 75%, #ff9a9e 100%)' }}>
-      {/* Floating Hearts */}
-      <div className="fixed top-10 left-10 text-4xl floating">🦄</div>
-      <div className="fixed top-20 right-20 text-3xl floating" style={{animationDelay: '1s'}}>🌈</div>
-      <div className="fixed bottom-20 left-20 text-2xl floating" style={{animationDelay: '2s'}}>💖</div>
-      
+    <div className="min-h-screen bg-black retro-grid">
       {/* Header */}
-      <div className="bubble-panel p-6 mb-6 sparkle">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h1 className="text-4xl font-bold unicorn-gradient flex items-center gap-3">
-              🦄 CONSILIENCE 🌈
-            </h1>
-            <p className="text-lg text-purple-600 mt-2 font-semibold">✨ Magical AI Collaboration Platform ✨</p>
-          </div>
-          <div className="text-right">
-            <div className="text-sm text-purple-500 font-medium">
-              {currentTime.toLocaleString()} 💫
-            </div>
-          </div>
-        </div>
+      <div className="border-b border-white/10 p-6">
         <div className="flex justify-between items-center">
-          <div className="flex items-center text-lg font-semibold">
-            <span className="text-2xl mr-2">{connected ? '💖' : '💔'}</span>
-            <span className="text-purple-600">
-              {connected ? 'Connected & Happy!' : 'Waiting for Magic...'}
-            </span>
+          <div>
+            <h1 className="text-2xl font-light glow-text mono">
+              CONSILIENCE
+            </h1>
+            <p className="text-sm text-white/60 mt-1">AI Collaboration Platform</p>
           </div>
-          <WalletMultiButton />
+          <div className="flex items-center gap-6">
+            <div className="text-xs text-white/40 mono">
+              {currentTime.toLocaleTimeString()}
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`status-dot ${connected ? 'opacity-100' : 'opacity-30'}`}></div>
+              <span className="text-sm text-white/60">
+                {connected ? 'Connected' : 'Disconnected'}
+              </span>
+            </div>
+            <WalletMultiButton />
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex gap-6 h-[calc(100vh-220px)]">
+      <div className="flex h-[calc(100vh-100px)]">
         {/* Chat Area */}
-        <div className="flex-1">
+        <div className="flex-1 p-6">
           {connected ? (
             <Chat walletAddress={publicKey?.toString()} socket={socket} />
           ) : (
-            <div className="bubble-panel h-full flex items-center justify-center">
+            <div className="h-full flex items-center justify-center">
               <div className="text-center">
-                <div className="text-8xl mb-6 floating">🦄</div>
-                <h3 className="text-2xl font-bold text-purple-600 mb-4">Connect Your Magical Wallet! ✨</h3>
-                <p className="text-lg text-purple-500 mb-8 font-medium">
-                  🌈 Join the unicorn collaboration adventure! 🌈
+                <div className="w-16 h-16 border border-white/20 rounded-full flex items-center justify-center mb-6 glow-accent">
+                  <div className="w-8 h-8 border border-white/40 rounded-full"></div>
+                </div>
+                <h3 className="text-xl font-light mb-2">Connect Wallet</h3>
+                <p className="text-white/60 mb-8 text-sm">
+                  Connect your Solana wallet to begin
                 </p>
                 <WalletMultiButton />
               </div>
@@ -70,7 +65,7 @@ const Terminal = () => {
 
         {/* Sidebar */}
         {connected && (
-          <div className="w-80">
+          <div className="w-80 border-l border-white/10 p-6">
             <WalletInfo walletAddress={publicKey?.toString()} />
           </div>
         )}

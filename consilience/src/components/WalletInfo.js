@@ -34,10 +34,10 @@ const WalletInfo = ({ walletAddress }) => {
 
   if (loading) {
     return (
-      <div className="bubble-panel p-6 h-full flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4 floating">🦄</div>
-          <p className="text-lg text-purple-600 font-semibold">Loading magical data... ✨</p>
+          <div className="w-8 h-8 border border-white/20 rounded-full animate-spin mb-4 glow-accent"></div>
+          <p className="text-sm text-white/60">Loading wallet data</p>
         </div>
       </div>
     );
@@ -45,76 +45,66 @@ const WalletInfo = ({ walletAddress }) => {
 
   return (
     <div className="space-y-6">
-      {/* Wallet Status */}
-      <div className="bubble-panel p-6 sparkle">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="text-3xl">💰</div>
-          <h3 className="text-xl font-bold text-purple-600">Magical Wallet ✨</h3>
-        </div>
+      {/* Wallet Overview */}
+      <div className="minimal-panel p-6 glow-border">
+        <h3 className="text-lg font-light mb-4 glow-text">Wallet</h3>
         <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-purple-500 font-medium">Address</span>
-            <span className="text-sm font-mono text-purple-700">{walletAddress?.slice(0, 8)}...{walletAddress?.slice(-8)}</span>
+            <span className="text-white/60 text-sm">Address</span>
+            <span className="text-xs mono text-white/80">{walletAddress?.slice(0, 8)}...{walletAddress?.slice(-8)}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-purple-500 font-medium">Balance</span>
-            <span className="font-bold text-purple-700">{walletData.balance.toFixed(4)} SOL 💎</span>
+            <span className="text-white/60 text-sm">Balance</span>
+            <span className="text-white font-medium">{walletData.balance.toFixed(4)} SOL</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-purple-500 font-medium">Tokens</span>
-            <span className="font-bold text-purple-700">{walletData.tokens.length} 🌈</span>
+            <span className="text-white/60 text-sm">Tokens</span>
+            <span className="text-white font-medium">{walletData.tokens.length}</span>
           </div>
         </div>
       </div>
 
       {/* Recent Activity */}
-      <div className="bubble-panel p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="text-3xl">🎆</div>
-          <h3 className="text-xl font-bold text-purple-600">Recent Magic ✨</h3>
-        </div>
+      <div className="minimal-panel p-6">
+        <h3 className="text-lg font-light mb-4 text-white/80">Activity</h3>
         <div className="space-y-3 max-h-48 overflow-y-auto">
           {walletData.transactions.length > 0 ? (
             walletData.transactions.slice(0, 5).map((tx, index) => (
-              <div key={index} className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-2xl p-4 border border-pink-200">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-xs font-mono text-purple-600">{tx.signature?.slice(0, 12)}...</span>
-                  <span className="text-xs text-purple-500">{new Date(tx.blockTime * 1000).toLocaleTimeString()}</span>
+              <div key={index} className="border-b border-white/10 pb-3 last:border-b-0">
+                <div className="flex justify-between items-start mb-1">
+                  <span className="text-xs mono text-white/40">{tx.signature?.slice(0, 12)}...</span>
+                  <span className="text-xs text-white/40">{new Date(tx.blockTime * 1000).toLocaleTimeString()}</span>
                 </div>
-                <div className="text-sm font-medium text-purple-700">🌈 {tx.type || 'Transaction'}</div>
+                <div className="text-sm text-white/70">{tx.type || 'Transaction'}</div>
               </div>
             ))
           ) : (
-            <div className="text-center py-8 text-purple-500">
-              <div className="text-4xl mb-3">🦄</div>
-              <p className="font-medium">No magical transactions yet!</p>
+            <div className="text-center py-8 text-white/40">
+              <p className="text-sm">No recent transactions</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Project Stats */}
-      <div className="bubble-panel p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="text-3xl">🏆</div>
-          <h3 className="text-xl font-bold text-purple-600">Unicorn Stats 🦄</h3>
-        </div>
+      {/* Stats */}
+      <div className="minimal-panel p-6">
+        <h3 className="text-lg font-light mb-4 text-white/80">Stats</h3>
         <div className="grid grid-cols-2 gap-4">
-          <div className="text-center p-4 bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl border border-pink-200">
-            <div className="text-2xl font-bold text-purple-600">0</div>
-            <div className="text-xs text-purple-500 font-medium">Active Projects 🌈</div>
+          <div className="text-center p-3 border border-white/10">
+            <div className="text-xl font-light text-white">0</div>
+            <div className="text-xs text-white/60">Projects</div>
           </div>
-          <div className="text-center p-4 bg-gradient-to-br from-yellow-100 to-pink-100 rounded-2xl border border-pink-200">
-            <div className="text-2xl font-bold text-purple-600">0</div>
-            <div className="text-xs text-purple-500 font-medium">Completed ✨</div>
+          <div className="text-center p-3 border border-white/10">
+            <div className="text-xl font-light text-white">0</div>
+            <div className="text-xs text-white/60">Completed</div>
           </div>
-          <div className="text-center p-4 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl border border-pink-200">
-            <div className="text-2xl font-bold text-purple-600">0</div>
-            <div className="text-xs text-purple-500 font-medium">Tokens Earned 💫</div>
+          <div className="text-center p-3 border border-white/10">
+            <div className="text-xl font-light text-white">0</div>
+            <div className="text-xs text-white/60">Tokens</div>
           </div>
-          <div className="text-center p-4 bg-gradient-to-br from-pink-100 to-yellow-100 rounded-2xl border border-pink-200">
-            <div className="text-2xl font-bold text-purple-600">0</div>
-            <div className="text-xs text-purple-500 font-medium">Team Matches 💖</div>
+          <div className="text-center p-3 border border-white/10">
+            <div className="text-xl font-light text-white">0</div>
+            <div className="text-xs text-white/60">Matches</div>
           </div>
         </div>
       </div>

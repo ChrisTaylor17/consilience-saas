@@ -13,7 +13,7 @@ const Chat = ({ walletAddress, socket }) => {
     const welcomeMessage = {
       id: Date.now(),
       sender: 'AI_AGENT',
-      content: `WELCOME TO CONSILIENCE, ${walletAddress?.slice(0, 8)}...\nI AM YOUR AI COLLABORATION AGENT.\nTYPE 'HELP' FOR AVAILABLE COMMANDS.`,
+      content: `Welcome to Consilience. I'm here to help you collaborate on blockchain projects and connect with teams.`,
       timestamp: new Date(),
       type: 'system'
     };
@@ -96,44 +96,44 @@ const Chat = ({ walletAddress, socket }) => {
 
 
   return (
-    <div className="bubble-panel h-full flex flex-col">
+    <div className="h-full flex flex-col">
       {/* Messages Area */}
-      <div className="flex-1 p-6 overflow-y-auto space-y-4">
+      <div className="flex-1 overflow-y-auto space-y-6 p-6">
         {messages.map((message) => (
-          <div key={message.id} className="flex items-start gap-3">
-            <div className="text-2xl">
-              {message.type === 'user' ? '😊' :
-               message.type === 'ai' ? '🦄' : '✨'}
-            </div>
-            <div className="flex-1">
-              <div className={`p-4 max-w-md ${
-                message.type === 'user' ? 'message-bubble-user ml-auto' :
-                message.type === 'ai' ? 'message-bubble-ai' :
-                'message-bubble-system'
-              }`}>
-                <div className="text-xs mb-2 opacity-75 font-medium">
-                  {message.type === 'system' ? '✨ System' : 
-                   message.type === 'ai' ? '🦄 AI Unicorn' : 
-                   `😊 ${message.sender?.slice(0, 8)}...`} • 
+          <div key={message.id} className="fade-in">
+            <div className={`p-4 ${
+              message.type === 'user' ? 'message-user ml-12' :
+              message.type === 'ai' ? 'message-ai mr-12' :
+              'message-system'
+            }`}>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="text-xs text-white/40 mono">
                   {message.timestamp ? message.timestamp.toLocaleTimeString() : new Date().toLocaleTimeString()}
                 </div>
-                <div className="text-sm whitespace-pre-wrap leading-relaxed font-medium">
-                  {message.content}
+                <div className="text-xs text-white/60">
+                  {message.type === 'system' ? 'System' : 
+                   message.type === 'ai' ? 'AI' : 
+                   message.sender?.slice(0, 8)}
                 </div>
+              </div>
+              <div className="text-sm leading-relaxed text-white/90">
+                {message.content}
               </div>
             </div>
           </div>
         ))}
         {isTyping && (
-          <div className="flex items-start gap-3">
-            <div className="text-2xl">🦄</div>
-            <div className="message-bubble-ai p-4 max-w-md">
-              <div className="text-xs mb-2 opacity-75 font-medium">
-                🦄 AI Unicorn • {new Date().toLocaleTimeString()}
+          <div className="fade-in">
+            <div className="message-ai mr-12 p-4">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="text-xs text-white/40 mono">
+                  {new Date().toLocaleTimeString()}
+                </div>
+                <div className="text-xs text-white/60">AI</div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Thinking magical thoughts</span>
-                <div className="typing-indicator">
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-white/70">Thinking</span>
+                <div className="typing-dots">
                   <div className="typing-dot"></div>
                   <div className="typing-dot"></div>
                   <div className="typing-dot"></div>
@@ -146,25 +146,23 @@ const Chat = ({ walletAddress, socket }) => {
       </div>
 
       {/* Input Area */}
-      <div className="p-6 border-t border-pink-200">
-        <div className="flex items-center gap-3">
-          <div className="text-2xl">😊</div>
+      <div className="border-t border-white/10 p-6">
+        <div className="flex items-center gap-4">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="flex-1 cute-input"
-            placeholder="Share your magical thoughts... ✨"
+            className="flex-1 minimal-input p-3 text-sm"
+            placeholder="Message..."
             maxLength={500}
           />
           <button
             onClick={handleSendMessage}
-            className="btn-cute flex items-center gap-2"
+            className="btn-minimal px-4 py-3 text-sm"
             disabled={!inputValue.trim()}
           >
-            <span>Send</span>
-            <span>🌈</span>
+            Send
           </button>
         </div>
       </div>
