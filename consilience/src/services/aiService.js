@@ -7,60 +7,17 @@ class AIService {
 
   async processMessage(message, walletAddress) {
     try {
-      // Handle basic commands
-      if (message.toUpperCase() === 'HELP') {
-        return this.getHelpMessage();
-      }
-
-      if (message.toUpperCase().startsWith('BALANCE')) {
-        return 'CHECKING WALLET BALANCE... USE THE SIDEBAR FOR DETAILED WALLET INFO.';
-      }
-
-      if (message.toUpperCase().includes('PROJECT')) {
-        // Mint reward tokens for project participation
-        try {
-          const response = await fetch(`${this.apiUrl}/blockchain/mint-tokens`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ recipientWallet: walletAddress, amount: 50, projectId: 'project_participation' })
-          });
-          const result = await response.json();
-          return `ANALYZING YOUR SKILLS FOR PROJECT MATCHING...\nBASED ON YOUR WALLET ACTIVITY, I RECOMMEND:\n- DEFI PROTOCOL DEVELOPMENT\n- NFT MARKETPLACE CREATION\n- DAO GOVERNANCE TOOLS\n\n${result.success ? 'REWARDED 50 TOKENS FOR PROJECT INTEREST!' : ''}\nWOULD YOU LIKE TO START A NEW PROJECT?`;
-        } catch (error) {
-          return 'ANALYZING YOUR SKILLS FOR PROJECT MATCHING...\nBASED ON YOUR WALLET ACTIVITY, I RECOMMEND:\n- DEFI PROTOCOL DEVELOPMENT\n- NFT MARKETPLACE CREATION\n- DAO GOVERNANCE TOOLS\n\nWOULD YOU LIKE TO START A NEW PROJECT?';
-        }
-      }
-
-      if (message.toUpperCase() === 'YES' || message.toUpperCase().includes('START')) {
-        return 'EXCELLENT! CREATING NEW PROJECT...\nPROJECT TYPE: DEFI PROTOCOL\nTEAM SIZE: 3-5 MEMBERS\nESTIMATED DURATION: 8-12 WEEKS\nTOKEN REWARDS: 500-1000 TOKENS\n\nPROJECT CREATED! USE "TEAM" TO FIND COLLABORATORS.';
-      }
-
-      if (message.toUpperCase().includes('TEAM')) {
-        // Mint reward tokens for team matching
-        try {
-          const response = await fetch(`${this.apiUrl}/blockchain/mint-tokens`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ recipientWallet: walletAddress, amount: 25, projectId: 'team_matching' })
-          });
-          const result = await response.json();
-          return `SEARCHING FOR COMPATIBLE TEAM MEMBERS...\nFOUND 3 POTENTIAL MATCHES:\n- DEVELOPER (RUST/SOLANA): 7KJ9...X2M4\n- DESIGNER (UI/UX): 9PL2...Y5N8\n- PRODUCT MANAGER: 4RT6...Z1Q3\n\n${result.success ? 'REWARDED 25 TOKENS FOR TEAM ENGAGEMENT!' : ''}\nSHALL I INITIATE TEAM FORMATION?`;
-        } catch (error) {
-          return 'SEARCHING FOR COMPATIBLE TEAM MEMBERS...\nFOUND 3 POTENTIAL MATCHES:\n- DEVELOPER (RUST/SOLANA): 7KJ9...X2M4\n- DESIGNER (UI/UX): 9PL2...Y5N8\n- PRODUCT MANAGER: 4RT6...Z1Q3\n\nSHALL I INITIATE TEAM FORMATION?';
-        }
-      }
-
-      // Call AI service API
+      // Call OpenAI API for all messages
       const response = await axios.post(`${this.apiUrl}/ai/chat`, {
         message,
         walletAddress,
         timestamp: new Date().toISOString()
       });
 
-      return response.data.response || 'AI SERVICE TEMPORARILY UNAVAILABLE. PLEASE TRY AGAIN.';
+      return response.data.response || 'AI service temporarily unavailable. Please try again.';
     } catch (error) {
       console.error('AI Service Error:', error);
-      return 'ERROR: UNABLE TO PROCESS REQUEST. PLEASE CHECK CONNECTION.';
+      return 'Unable to process request. Please check connection.';
     }
   }
 
