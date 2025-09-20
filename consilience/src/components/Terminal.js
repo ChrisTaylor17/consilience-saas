@@ -186,7 +186,53 @@ const Terminal = () => {
                   )}
                 </div>
                 
-                <TaskPanel />
+                {/* New Task System */}
+                <div className="w-80 border-l border-white/20 p-4">
+                  <h3 className="text-lg mb-4 text-white">My Tasks</h3>
+                  
+                  <div className="mb-4">
+                    <input
+                      id="new-task-input"
+                      className="w-full p-2 bg-black border border-white/20 text-white mb-2"
+                      placeholder="Enter task..."
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          const input = e.target;
+                          const text = input.value.trim();
+                          if (text) {
+                            const container = document.getElementById('tasks-container');
+                            const div = document.createElement('div');
+                            div.className = 'p-2 border border-white/20 rounded mb-2 text-white flex justify-between items-center';
+                            div.innerHTML = `<span>${text}</span><button onclick="this.parentElement.remove()" class="text-xs px-2 py-1 border border-white/20">✓</button>`;
+                            container.appendChild(div);
+                            input.value = '';
+                          }
+                        }
+                      }}
+                    />
+                    <button 
+                      onClick={() => {
+                        const input = document.getElementById('new-task-input');
+                        const text = input.value.trim();
+                        if (text) {
+                          const container = document.getElementById('tasks-container');
+                          const div = document.createElement('div');
+                          div.className = 'p-2 border border-white/20 rounded mb-2 text-white flex justify-between items-center';
+                          div.innerHTML = `<span>${text}</span><button onclick="this.parentElement.remove()" class="text-xs px-2 py-1 border border-white/20">✓</button>`;
+                          container.appendChild(div);
+                          input.value = '';
+                        }
+                      }}
+                      className="px-3 py-1 border border-white/20 text-white hover:bg-white/10"
+                    >
+                      Add Task
+                    </button>
+                  </div>
+
+                  <div id="tasks-container" className="space-y-2">
+                    {/* Tasks appear here */}
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
