@@ -3,11 +3,13 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import Chat from './Chat';
 import WalletInfo from './WalletInfo';
+import ChannelSidebar from './ChannelSidebar';
 import { useSocket } from '../hooks/useSocket';
 
 const Terminal = () => {
   const { connected, publicKey } = useWallet();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentChannel, setCurrentChannel] = useState({ id: 'general', name: 'general', description: 'Main discussion' });
   const socket = useSocket();
 
   useEffect(() => {
@@ -43,10 +45,43 @@ const Terminal = () => {
 
       {/* Main Content */}
       <div className="flex h-[calc(100vh-100px)]">
+        {/* Channel Sidebar */}
+        {connected && (
+          <ChannelSidebar 
+            currentChannel={currentChannel}
+            onChannelChange={setCurrentChannel}
+            walletAddress={publicKey?.toString()}
+          />
+        )}
+
         {/* Chat Area */}
-        <div className="flex-1 p-6">
+        <div className="flex-1">
           {connected ? (
-            <Chat walletAddress={publicKey?.toString()} socket={socket} />
+            <div className="h-full flex flex-col">
+              {/* Channel Header */}
+              <div className="border-b border-white/10 p-4">
+                <div className="flex items-center gap-2">
+                  {currentChannel?.isAI ? (
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-white/20 to-white/10 flex items-center justify-center">
+                      <span className="text-xs">AI</span>
+                    </div>
+                  ) : (
+                    <span className="text-white/40">#</span>
+                  )}
+                  <h2 className="text-lg font-medium">{currentChannel?.name}</h2>
+                </div>
+                <p className="text-sm text-white/60 mt-1">{currentChannel?.description}</p>
+              </div>
+              
+              {/* Chat Component */}
+              <div className="flex-1">
+                <Chat 
+                  walletAddress={publicKey?.toString()} 
+                  socket={socket} 
+                  currentChannel={currentChannel}
+                />
+              </div>
+            </div>
           ) : (
             <div className="h-full flex items-center justify-center">
               <div className="text-center">
@@ -63,7 +98,7 @@ const Terminal = () => {
           )}
         </div>
 
-        {/* Sidebar */}
+        {/* Wallet Info Sidebar */}
         {connected && (
           <div className="w-80 border-l border-white/10 p-6">
             <WalletInfo walletAddress={publicKey?.toString()} />

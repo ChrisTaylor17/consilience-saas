@@ -2,29 +2,57 @@ import React, { useState, useEffect, useRef } from 'react';
 import { aiService } from '../services/aiService';
 import { blockchainService } from '../services/blockchainService';
 
-const Chat = ({ walletAddress, socket }) => {
-  const [messages, setMessages] = useState([]);
+const Chat = ({ walletAddress, socket, currentChannel }) => {
+  const [messagesByChannel, setMessagesByChannel] = useState({});
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
-  useEffect(() => {
-    // Initialize with welcome message
-    const welcomeMessage = {
-      id: Date.now(),
-      sender: 'AI_AGENT',
-      content: `Welcome to Consilience. Type /ai or @ai followed by your message to chat with the AI assistant.`,
-      timestamp: new Date(),
-      type: 'system'
-    };
-    setMessages([welcomeMessage]);
+  // Get messages for current channel
+  const messages = messagesByChannel[currentChannel?.id] || [];
+  const setMessages = (updater) => {
+    setMessagesByChannel(prev => ({
+      ...prev,
+      [currentChannel?.id]: typeof updater === 'function' ? updater(prev[currentChannel?.id] || []) : updater
+    }));
+  };
 
-    // Socket event listeners for real-time chat
-    if (socket) {
-      const handleMessage = (message) => {
+  useEffect(() => {
+    if (!currentChannel) return;
+
+    // Initialize channel with welcome message if empty
+    if (!messagesByChannel[currentChannel.id]) {
+      let welcomeMessage;
+      
+      if (currentChannel.isAI) {
+        welcomeMessage = {
+          id: Date.now(),
+          sender: 'AI_AGENT',
+          content: `Hello! I'm your personal AI assistant. I can help you with blockchain projects, team formation, and Solana development. What would you like to work on?`,
+          timestamp: new Date(),
+          type: 'ai'
+        };
+      } else {
+        welcomeMessage = {
+          id: Date.now(),
+          sender: 'SYSTEM',
+          content: `Welcome to #${currentChannel.name}. ${currentChannel.description}.`,
+          timestamp: new Date(),
+          type: 'system'
+        };
+      }
+      
+      setMessages([welcomeMessage]);
+    }
+
+    // Socket event listeners for real-time chat (only for public channels)
+    if (socket && !currentChannel?.isAI) {
+      const handleMessage = (data) => {
         try {
-          // Only add messages from other users (not yourself)
-          if (message && message.content && message.sender && message.sender !== walletAddress) {
+          const { message, channel } = data;
+          // Only add messages from other users in the same channel
+          if (message && message.content && message.sender && 
+              message.sender !== walletAddress && channel === currentChannel.id) {
             const safeMessage = {
               id: message.id || Date.now(),
               sender: message.sender,
@@ -32,7 +60,11 @@ const Chat = ({ walletAddress, socket }) => {
               timestamp: message.timestamp ? new Date(message.timestamp) : new Date(),
               type: message.type || 'user'
             };
-            setMessages(prev => [...prev, safeMessage]);
+            
+            setMessagesByChannel(prev => ({
+              ...prev,
+              [channel]: [...(prev[channel] || []), safeMessage]
+            }));
           }
         } catch (error) {
           console.error('Handle message error:', error);
@@ -41,15 +73,20 @@ const Chat = ({ walletAddress, socket }) => {
 
       const handleUserJoined = (data) => {
         try {
-          if (data && data.walletAddress && data.walletAddress !== walletAddress) {
+          if (data && data.walletAddress && data.walletAddress !== walletAddress && 
+              data.channel === currentChannel.id) {
             const joinMessage = {
               id: Date.now(),
               sender: 'SYSTEM',
-              content: `${data.walletAddress.slice(0, 8)}... joined the chat`,
+              content: `${data.walletAddress.slice(0, 8)}... joined #${currentChannel.name}`,
               timestamp: new Date(),
               type: 'system'
             };
-            setMessages(prev => [...prev, joinMessage]);
+            
+            setMessagesByChannel(prev => ({
+              ...prev,
+              [data.channel]: [...(prev[data.channel] || []), joinMessage]
+            }));
           }
         } catch (error) {
           console.error('Handle user joined error:', error);
@@ -60,8 +97,8 @@ const Chat = ({ walletAddress, socket }) => {
       socket.on('user_joined', handleUserJoined);
       socket.on('error', (error) => console.error('Socket error:', error));
 
-      // Announce user joined
-      socket.emit('user_joined', { walletAddress });
+      // Announce user joined this channel
+      socket.emit('user_joined', { walletAddress, channel: currentChannel.id });
 
       return () => {
         socket.off('message', handleMessage);
@@ -69,7 +106,7 @@ const Chat = ({ walletAddress, socket }) => {
         socket.off('error');
       };
     }
-  }, [walletAddress, socket]);
+  }, [walletAddress, socket, currentChannel]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -93,31 +130,53 @@ const Chat = ({ walletAddress, socket }) => {
       setInputValue('');
       setIsTyping(true);
 
-      // Emit user message to other users
-      if (socket && socket.connected) {
-        socket.emit('message', userMessage);
-      }
+      if (currentChannel?.isAI) {
+        // AI Channel - always get AI response
+        try {
+          const aiResponse = await aiService.processMessage(`/ai ${messageContent}`, walletAddress);
+          
+          if (aiResponse) {
+            const aiMessage = {
+              id: Date.now() + 1,
+              sender: 'AI_AGENT',
+              content: aiResponse,
+              timestamp: new Date(),
+              type: 'ai'
+            };
 
-      // Only process AI response if message was directed to AI
-      try {
-        const aiResponse = await aiService.processMessage(messageContent, walletAddress);
-        
-        // Only show AI response if there was one (message was directed to AI)
-        if (aiResponse) {
-          const aiMessage = {
-            id: Date.now() + 1,
-            sender: 'AI_AGENT',
-            content: aiResponse,
-            timestamp: new Date(),
-            type: 'ai'
-          };
-
-          setMessages(prev => [...prev, aiMessage]);
+            setMessages(prev => [...prev, aiMessage]);
+          }
+        } catch (error) {
+          console.error('AI response error:', error);
+        } finally {
+          setIsTyping(false);
         }
-      } catch (error) {
-        console.error('AI response error:', error);
-      } finally {
-        setIsTyping(false);
+      } else {
+        // Public Channel - emit to other users and check for AI commands
+        if (socket && socket.connected) {
+          socket.emit('message', { ...userMessage, channel: currentChannel.id });
+        }
+
+        // Check if message was directed to AI
+        try {
+          const aiResponse = await aiService.processMessage(messageContent, walletAddress);
+          
+          if (aiResponse) {
+            const aiMessage = {
+              id: Date.now() + 1,
+              sender: 'AI_AGENT',
+              content: aiResponse,
+              timestamp: new Date(),
+              type: 'ai'
+            };
+
+            setMessages(prev => [...prev, aiMessage]);
+          }
+        } catch (error) {
+          console.error('AI response error:', error);
+        } finally {
+          setIsTyping(false);
+        }
       }
     } catch (error) {
       console.error('Message send error:', error);
@@ -193,7 +252,7 @@ const Chat = ({ walletAddress, socket }) => {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             className="flex-1 minimal-input p-3 text-sm"
-            placeholder="Message... (use /ai for AI assistant)"
+            placeholder={currentChannel?.isAI ? "Message AI assistant..." : "Message... (use /ai for AI assistant)"}
             maxLength={500}
           />
           <button

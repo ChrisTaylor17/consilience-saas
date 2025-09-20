@@ -46,12 +46,13 @@ io.on('connection', (socket) => {
 
   socket.on('user_joined', (data) => {
     socket.broadcast.emit('user_joined', data);
-    console.log(`User ${data.walletAddress} joined`);
+    console.log(`User ${data.walletAddress} joined channel ${data.channel}`);
   });
 
   socket.on('message', (data) => {
-    // Broadcast message to all clients in the room
+    // Broadcast message to all clients
     socket.broadcast.emit('message', data);
+    console.log(`Message in channel ${data.channel}: ${data.message?.content}`);
   });
 
   socket.on('disconnect', () => {
