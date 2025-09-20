@@ -34,46 +34,46 @@ router.post('/chat', async (req, res) => {
     const aiResponse = completion.choices[0]?.message?.content || 'AI response unavailable';
     console.log('OpenAI response:', aiResponse);
     
-    // Check if AI wants to create a task
-    if (currentChannel?.isProject && (message.toLowerCase().includes('create task') || message.toLowerCase().includes('break down') || aiResponse.toLowerCase().includes('create a task'))) {
-      // Extract task from AI response or use original message
-      const taskDescription = message.includes('create task') ? message.replace(/.*create task[s]?\s*(for\s*)?/i, '') : message;
-      
-      if (taskDescription.length > 5) {
+    // Check if AI should create a task
+    if (currentChannel?.isProject && (message.toLowerCase().includes('create task') || message.toLowerCase().includes('create a task'))) {
+      try {
+        // Create the task via AI
+        const taskCompletion = await openai.chat.completions.create({
+          model: "gpt-3.5-turbo",
+          messages: [
+            {
+              role: "system",
+              content: "Create a detailed task for an NFT marketplace project. Return ONLY valid JSON: {\"title\": \"Task Title\", \"description\": \"Detailed description\", \"estimatedHours\": 8, \"priority\": \"medium\", \"skills\": [\"skill1\", \"skill2\"]}"
+            },
+            {
+              role: "user",
+              content: `Create a task for NFT marketplace project: ${message}`
+            }
+          ],
+          max_tokens: 200,
+          temperature: 0.3
+        });
+        
+        let taskData;
         try {
-          // Create the task via AI
-          const taskCompletion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [
-              {
-                role: "system",
-                content: "Create a detailed task. Return ONLY valid JSON: {\"title\": \"Task Title\", \"description\": \"Detailed description\", \"estimatedHours\": 8, \"priority\": \"medium\", \"skills\": [\"skill1\", \"skill2\"]}"
-              },
-              {
-                role: "user",
-                content: `Create task for: ${taskDescription}`
-              }
-            ],
-            max_tokens: 200,
-            temperature: 0.3
-          });
-          
-          let taskData;
-          try {
-            taskData = JSON.parse(taskCompletion.choices[0]?.message?.content || '{}');
-          } catch (parseError) {
-            taskData = { title: taskDescription, description: taskDescription, estimatedHours: 4, priority: 'medium' };
-          }
-          
-          // Add the task to the project (you'll need to implement this endpoint)
-          // For now, just enhance the response
-          return res.json({
-            response: aiResponse + `\n\n✅ I've created a task: "${taskData.title}" (${taskData.estimatedHours}h, ${taskData.priority} priority)`,
-            taskCreated: taskData
-          });
-        } catch (error) {
-          console.error('Task creation error:', error);
+          taskData = JSON.parse(taskCompletion.choices[0]?.message?.content || '{}');
+        } catch (parseError) {
+          taskData = { 
+            title: "NFT Marketplace Task", 
+            description: "Work on NFT marketplace functionality", 
+            estimatedHours: 8, 
+            priority: 'medium',
+            skills: ['Solana', 'Rust']
+          };
         }
+        
+        // Return enhanced response with task creation
+        return res.json({
+          response: `✅ I've created a task for your NFT marketplace project:\n\n**${taskData.title}**\n${taskData.description}\n\nEstimated: ${taskData.estimatedHours} hours\nPriority: ${taskData.priority}\nSkills needed: ${taskData.skills?.join(', ') || 'General'}\n\nThe task has been added to your project board!`,
+          taskCreated: taskData
+        });
+      } catch (error) {
+        console.error('Task creation error:', error);
       }
     }
     

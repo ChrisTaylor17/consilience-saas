@@ -50,9 +50,10 @@ const Chat = ({ walletAddress, socket, currentChannel }) => {
       const handleMessage = (data) => {
         try {
           const { message, channel } = data;
-          // Only add messages from other users in the same channel
+          // Add messages from other users OR AI responses in the same channel
           if (message && message.content && message.sender && 
-              message.sender !== walletAddress && channel === currentChannel.id) {
+              (message.sender !== walletAddress || message.sender === 'AI_AGENT') && 
+              channel === currentChannel.id) {
             const safeMessage = {
               id: message.id || Date.now(),
               sender: message.sender,
