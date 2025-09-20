@@ -47,7 +47,13 @@ const SimpleTasks = () => {
           className="w-full p-2 bg-black border border-white/20 text-white mb-2"
           placeholder="Add new task..."
         />
-        <button onClick={addTask} className="px-3 py-1 border border-white/20 text-white">
+        <button 
+          onClick={() => {
+            console.log('Button clicked!');
+            addTask();
+          }} 
+          className="px-3 py-1 border border-white/20 text-white hover:bg-white/10"
+        >
           Add Task
         </button>
       </div>

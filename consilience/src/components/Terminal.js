@@ -188,11 +188,9 @@ const Terminal = () => {
                 </div>
                 
                 {/* Task Panel */}
-                {!showProjectBrowser && (
-                  <div className="w-80">
-                    <SimpleTasks />
-                  </div>
-                )}
+                <div className="w-80">
+                  <SimpleTasks />
+                </div>
               </div>
             </div>
           ) : (
