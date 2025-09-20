@@ -8,6 +8,7 @@ import UserProfileModal from './UserProfileModal';
 import ProjectModal from './ProjectModal';
 import ProjectBrowser from './ProjectBrowser';
 import TaskManager from './TaskManager';
+import UserMatcher from './UserMatcher';
 import { useSocket } from '../hooks/useSocket';
 import { projectService } from '../services/projectService';
 
@@ -176,9 +177,18 @@ const Terminal = () => {
                 <div className="flex-1">
                   {showProjectBrowser ? (
                     <div className="p-6">
-                      <ProjectBrowser 
+                      <div className="mb-6">
+                        <ProjectBrowser 
+                          walletAddress={publicKey?.toString()}
+                          onJoinProject={handleJoinProject}
+                        />
+                      </div>
+                      <UserMatcher 
                         walletAddress={publicKey?.toString()}
-                        onJoinProject={handleJoinProject}
+                        userProfile={userProfile}
+                        onMatch={(match) => {
+                          console.log('Matched with:', match);
+                        }}
                       />
                     </div>
                   ) : (

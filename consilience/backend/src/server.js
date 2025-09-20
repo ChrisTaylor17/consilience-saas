@@ -50,9 +50,14 @@ io.on('connection', (socket) => {
   });
 
   socket.on('message', (data) => {
-    // Broadcast message to all clients
+    // Broadcast message to all clients including AI responses
+    console.log('Broadcasting message:', data);
     socket.broadcast.emit('message', data);
-    console.log(`Message in channel ${data.channel}: ${data.message?.content}`);
+    
+    // Also emit to the sender if it's an AI response
+    if (data.message?.sender === 'AI_AGENT') {
+      socket.emit('message', data);
+    }
   });
 
   socket.on('disconnect', () => {

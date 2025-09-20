@@ -8,21 +8,32 @@ const TaskManager = ({ project, walletAddress, onTaskUpdate }) => {
   const handleAddTask = async () => {
     if (!newTask.title) return;
     
-    const task = await projectService.addTask(project.id, {
-      ...newTask,
-      assignee: newTask.assignee || walletAddress
-    });
+    // Create task directly without backend for now
+    const task = {
+      id: `task_${Date.now()}`,
+      title: newTask.title,
+      description: newTask.description,
+      assignee: newTask.assignee || walletAddress,
+      status: 'todo',
+      createdAt: new Date().toISOString()
+    };
     
-    if (task) {
-      onTaskUpdate();
-      setNewTask({ title: '', description: '', assignee: '' });
-      setShowAddTask(false);
-    }
+    // Add to project tasks locally
+    if (!project.tasks) project.tasks = [];
+    project.tasks.push(task);
+    
+    onTaskUpdate();
+    setNewTask({ title: '', description: '', assignee: '' });
+    setShowAddTask(false);
   };
 
-  const handleStatusChange = async (taskId, status) => {
-    await projectService.updateTaskStatus(project.id, taskId, status);
-    onTaskUpdate();
+  const handleStatusChange = (taskId, status) => {
+    // Update task status locally
+    const task = project.tasks?.find(t => t.id === taskId);
+    if (task) {
+      task.status = status;
+      onTaskUpdate();
+    }
   };
 
   const tasksByStatus = {
