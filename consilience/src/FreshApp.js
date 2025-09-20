@@ -98,7 +98,7 @@ const FreshApp = () => {
     <div className="min-h-screen bg-black text-white p-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">CONSILIENCE FRESH v5.0</h1>
+          <h1 className="text-2xl font-bold">NUCLEAR FRESH v7.0 - NO CACHE</h1>
           <WalletMultiButton />
         </div>
 
