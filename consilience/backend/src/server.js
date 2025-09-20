@@ -32,7 +32,7 @@ app.use('/api/blockchain', blockchainRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({ status: 'OK', timestamp: new Date().toISOString(), version: 'OpenAI-v1' });
 });
 
 // Socket.IO connection handling
