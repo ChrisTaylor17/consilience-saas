@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import SimpleChat from './SimpleChat';
+import SimpleTasks from './SimpleTasks';
+import SimpleMatching from './SimpleMatching';
 import WalletInfo from './WalletInfo';
 import ChannelSidebar from './ChannelSidebar';
 import UserProfileModal from './UserProfileModal';
@@ -176,21 +178,7 @@ const Terminal = () => {
                 {/* Chat Component */}
                 <div className="flex-1">
                   {showProjectBrowser ? (
-                    <div className="p-6">
-                      <div className="mb-6">
-                        <ProjectBrowser 
-                          walletAddress={publicKey?.toString()}
-                          onJoinProject={handleJoinProject}
-                        />
-                      </div>
-                      <UserMatcher 
-                        walletAddress={publicKey?.toString()}
-                        userProfile={userProfile}
-                        onMatch={(match) => {
-                          console.log('Matched with:', match);
-                        }}
-                      />
-                    </div>
+                    <SimpleMatching walletAddress={publicKey?.toString()} />
                   ) : (
                     <SimpleChat 
                       walletAddress={publicKey?.toString()} 
@@ -199,14 +187,10 @@ const Terminal = () => {
                   )}
                 </div>
                 
-                {/* Project Task Panel */}
-                {currentChannel?.isProject && !showProjectBrowser && (
-                  <div className="w-80 border-l border-white/10 p-4">
-                    <TaskManager 
-                      project={currentChannel.project}
-                      walletAddress={publicKey?.toString()}
-                      onTaskUpdate={handleTaskUpdate}
-                    />
+                {/* Task Panel */}
+                {!showProjectBrowser && (
+                  <div className="w-80">
+                    <SimpleTasks />
                   </div>
                 )}
               </div>

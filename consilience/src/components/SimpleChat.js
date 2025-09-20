@@ -57,8 +57,9 @@ const SimpleChat = ({ walletAddress, socket }) => {
 
         setMessages(prev => [...prev, aiMessage]);
         
-        // Broadcast AI response
+        // Broadcast AI response to ALL users
         if (socket) {
+          console.log('Broadcasting AI message:', aiMessage);
           socket.emit('message', { message: aiMessage, channel: 'general' });
         }
       } catch (error) {
