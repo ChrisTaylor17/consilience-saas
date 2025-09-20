@@ -9,8 +9,7 @@ import ChannelSidebar from './ChannelSidebar';
 import UserProfileModal from './UserProfileModal';
 import ProjectModal from './ProjectModal';
 import ProjectBrowser from './ProjectBrowser';
-import TaskManager from './TaskManager';
-import UserMatcher from './UserMatcher';
+// Removed old imports
 import { useSocket } from '../hooks/useSocket';
 import { projectService } from '../services/projectService';
 
