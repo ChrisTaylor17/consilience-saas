@@ -93,4 +93,64 @@ router.get('/profiles', (req, res) => {
   res.json(userProfiles);
 });
 
+// Add task
+router.post('/:projectId/tasks', (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { task, walletAddress } = req.body;
+    
+    const project = projects[projectId];
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+    
+    const taskId = `task_${Date.now()}`;
+    const newTask = {
+      id: taskId,
+      title: task.title,
+      description: task.description,
+      assignee: task.assignee || walletAddress,
+      status: 'todo',
+      estimatedHours: task.estimatedHours || 0,
+      priority: task.priority || 'medium',
+      skills: task.skills || [],
+      createdAt: new Date().toISOString()
+    };
+    
+    if (!project.tasks) project.tasks = [];
+    project.tasks.push(newTask);
+    
+    res.json({ success: true, task: newTask });
+  } catch (error) {
+    console.error('Add task error:', error);
+    res.status(500).json({ error: 'Failed to add task' });
+  }
+});
+
+// Update task status
+router.put('/:projectId/tasks/:taskId', (req, res) => {
+  try {
+    const { projectId, taskId } = req.params;
+    const { status, assignee } = req.body;
+    
+    const project = projects[projectId];
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+    
+    const task = project.tasks?.find(t => t.id === taskId);
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+    
+    if (status) task.status = status;
+    if (assignee) task.assignee = assignee;
+    
+    res.json({ success: true, task });
+  } catch (error) {
+    console.error('Update task error:', error);
+    res.status(500).json({ error: 'Failed to update task' });
+  }
+});
+
 module.exports = router;

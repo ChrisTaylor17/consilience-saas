@@ -133,7 +133,7 @@ const Chat = ({ walletAddress, socket, currentChannel }) => {
       if (currentChannel?.isAI) {
         // AI Channel - always get AI response
         try {
-          const aiResponse = await aiService.processMessage(messageContent, walletAddress, true);
+          const aiResponse = await aiService.processMessage(messageContent, walletAddress, true, currentChannel);
           
           if (aiResponse) {
             const aiMessage = {
@@ -159,7 +159,7 @@ const Chat = ({ walletAddress, socket, currentChannel }) => {
 
         // Check if message was directed to AI
         try {
-          const aiResponse = await aiService.processMessage(messageContent, walletAddress);
+          const aiResponse = await aiService.processMessage(messageContent, walletAddress, false, currentChannel);
           
           if (aiResponse) {
             const aiMessage = {
@@ -171,6 +171,11 @@ const Chat = ({ walletAddress, socket, currentChannel }) => {
             };
 
             setMessages(prev => [...prev, aiMessage]);
+            
+            // Broadcast AI response to other users in public channels
+            if (socket && socket.connected) {
+              socket.emit('message', { message: aiMessage, channel: currentChannel.id });
+            }
           }
         } catch (error) {
           console.error('AI response error:', error);

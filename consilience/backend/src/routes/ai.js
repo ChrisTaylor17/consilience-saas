@@ -10,7 +10,7 @@ const openai = new OpenAI({
 // Chat endpoint
 router.post('/chat', async (req, res) => {
   try {
-    const { message, walletAddress, userProfile } = req.body;
+    const { message, walletAddress, userProfile, currentChannel } = req.body;
     
     // Call OpenAI API
     console.log('Calling OpenAI with message:', message);
@@ -24,7 +24,7 @@ router.post('/chat', async (req, res) => {
         },
         {
           role: "user",
-          content: `User wallet: ${walletAddress}\nUser profile: ${userProfile ? JSON.stringify(userProfile) : 'No profile available'}\nMessage: ${message}\n\nContext: This user is on a blockchain collaboration platform. If they mention skills, project ideas, or looking for teammates, be proactive about suggesting they browse existing projects or create new ones. Encourage collaboration and connections.`
+          content: `User wallet: ${walletAddress}\nUser profile: ${userProfile ? JSON.stringify(userProfile) : 'No profile available'}\nCurrent channel: ${currentChannel ? JSON.stringify(currentChannel) : 'General chat'}\nMessage: ${message}\n\nContext: This user is on a blockchain collaboration platform. If they mention skills, project ideas, or looking for teammates, be proactive about suggesting they browse existing projects or create new ones. If they're in a project channel and ask you to create tasks, be specific about task creation and assignment. If they ask you to create tasks or break down work, offer to help organize the project. Encourage collaboration and connections.`
         }
       ],
       max_tokens: 300,
@@ -103,6 +103,48 @@ router.post('/create-project', async (req, res) => {
     console.error('AI Project Creation Error:', error);
     res.status(500).json({
       error: 'PROJECT CREATION FAILED',
+      success: false
+    });
+  }
+});
+
+// AI Task Creation endpoint
+router.post('/create-task', async (req, res) => {
+  try {
+    const { projectId, taskDescription, walletAddress } = req.body;
+    
+    // Use AI to create detailed task
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "You are a project manager AI. Create a detailed task based on the description. Return JSON format with: {title, description, estimatedHours, skills, priority}. Be specific and actionable."
+        },
+        {
+          role: "user",
+          content: `Create a task for: ${taskDescription}`
+        }
+      ],
+      max_tokens: 300,
+      temperature: 0.7
+    });
+    
+    let aiTask;
+    try {
+      aiTask = JSON.parse(completion.choices[0]?.message?.content || '{}');
+    } catch (parseError) {
+      aiTask = { title: taskDescription, description: taskDescription };
+    }
+    
+    res.json({
+      task: aiTask,
+      success: true
+    });
+  } catch (error) {
+    console.error('AI Task Creation Error:', error);
+    res.status(500).json({
+      error: 'TASK CREATION FAILED',
       success: false
     });
   }

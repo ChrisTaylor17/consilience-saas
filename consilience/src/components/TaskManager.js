@@ -5,10 +5,10 @@ const TaskManager = ({ project, walletAddress, onTaskUpdate }) => {
   const [newTask, setNewTask] = useState({ title: '', description: '', assignee: '' });
   const [showAddTask, setShowAddTask] = useState(false);
 
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     if (!newTask.title) return;
     
-    const task = projectService.addTask(project.id, {
+    const task = await projectService.addTask(project.id, {
       ...newTask,
       assignee: newTask.assignee || walletAddress
     });
@@ -20,8 +20,8 @@ const TaskManager = ({ project, walletAddress, onTaskUpdate }) => {
     }
   };
 
-  const handleStatusChange = (taskId, status) => {
-    projectService.updateTaskStatus(project.id, taskId, status);
+  const handleStatusChange = async (taskId, status) => {
+    await projectService.updateTaskStatus(project.id, taskId, status);
     onTaskUpdate();
   };
 

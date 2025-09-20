@@ -73,36 +73,34 @@ class ProjectService {
     }
   }
 
-  addTask(projectId, task) {
-    const project = this.projects[projectId];
-    if (project) {
-      const taskId = `task_${Date.now()}`;
-      const newTask = {
-        id: taskId,
-        title: task.title,
-        description: task.description,
-        assignee: task.assignee,
-        status: 'todo',
-        createdAt: new Date().toISOString()
-      };
-      project.tasks.push(newTask);
-      this.saveProjects();
-      return newTask;
+  async addTask(projectId, task) {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3003/api'}/projects/${projectId}/tasks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task, walletAddress: task.assignee })
+      });
+      const result = await response.json();
+      return result.task;
+    } catch (error) {
+      console.error('Add task error:', error);
+      return null;
     }
-    return null;
   }
 
-  updateTaskStatus(projectId, taskId, status) {
-    const project = this.projects[projectId];
-    if (project) {
-      const task = project.tasks.find(t => t.id === taskId);
-      if (task) {
-        task.status = status;
-        this.saveProjects();
-        return true;
-      }
+  async updateTaskStatus(projectId, taskId, status, assignee = null) {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3003/api'}/projects/${projectId}/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, assignee })
+      });
+      const result = await response.json();
+      return result.success;
+    } catch (error) {
+      console.error('Update task error:', error);
+      return false;
     }
-    return false;
   }
 }
 

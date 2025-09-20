@@ -5,7 +5,7 @@ class AIService {
     this.apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
   }
 
-  async processMessage(message, walletAddress, isAIChannel = false) {
+  async processMessage(message, walletAddress, isAIChannel = false, currentChannel = null) {
     try {
       // In AI channel, process all messages. In public channels, only /ai or @ai
       if (!isAIChannel && !message.toLowerCase().startsWith('/ai ') && !message.toLowerCase().startsWith('@ai ')) {
@@ -22,6 +22,7 @@ class AIService {
         message: cleanMessage,
         walletAddress,
         userProfile,
+        currentChannel,
         timestamp: new Date().toISOString()
       });
 
@@ -70,6 +71,21 @@ class AIService {
       return response.data.project || null;
     } catch (error) {
       console.error('Create project error:', error);
+      return null;
+    }
+  }
+
+  async createTask(projectId, taskDescription, walletAddress) {
+    try {
+      const response = await axios.post(`${this.apiUrl}/ai/create-task`, {
+        projectId,
+        taskDescription,
+        walletAddress
+      });
+
+      return response.data.task || null;
+    } catch (error) {
+      console.error('Create task error:', error);
       return null;
     }
   }
