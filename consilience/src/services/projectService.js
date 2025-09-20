@@ -19,7 +19,8 @@ class ProjectService {
 
   async createProject(projectData) {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3003/api'}/projects`, {
+      const apiUrl = process.env.REACT_APP_API_URL || 'https://consilience-saas-production.up.railway.app/api';
+      const response = await fetch(`${apiUrl}/projects`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ project: projectData, walletAddress: projectData.creator })
@@ -38,7 +39,8 @@ class ProjectService {
 
   async getAllProjects() {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3003/api'}/projects`);
+      const apiUrl = process.env.REACT_APP_API_URL || 'https://consilience-saas-production.up.railway.app/api';
+      const response = await fetch(`${apiUrl}/projects`);
       const projects = await response.json();
       return projects;
     } catch (error) {
@@ -49,7 +51,8 @@ class ProjectService {
 
   async getUserProjects(walletAddress) {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3003/api'}/projects/user/${walletAddress}`);
+      const apiUrl = process.env.REACT_APP_API_URL || 'https://consilience-saas-production.up.railway.app/api';
+      const response = await fetch(`${apiUrl}/projects/user/${walletAddress}`);
       const projects = await response.json();
       return projects;
     } catch (error) {
@@ -60,7 +63,8 @@ class ProjectService {
 
   async joinProject(projectId, walletAddress) {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3003/api'}/projects/${projectId}/join`, {
+      const apiUrl = process.env.REACT_APP_API_URL || 'https://consilience-saas-production.up.railway.app/api';
+      const response = await fetch(`${apiUrl}/projects/${projectId}/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ walletAddress })
