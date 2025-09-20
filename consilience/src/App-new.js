@@ -10,6 +10,10 @@ const AppNew = () => {
   const [tasks, setTasks] = useState([]);
   const [taskInput, setTaskInput] = useState('');
   const [socket, setSocket] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [currentProject, setCurrentProject] = useState(null);
+  const [showCreateProject, setShowCreateProject] = useState(false);
+  const [newProjectName, setNewProjectName] = useState('');
 
   useEffect(() => {
     const newSocket = io('https://consilience-saas-production.up.railway.app');
@@ -88,6 +92,30 @@ const AppNew = () => {
     setTaskInput('');
   };
 
+  const createProject = () => {
+    if (!newProjectName.trim()) return;
+    
+    const project = {
+      id: Date.now(),
+      name: newProjectName,
+      creator: publicKey?.toString(),
+      members: [publicKey?.toString()],
+      tasks: [],
+      messages: []
+    };
+    
+    setProjects(prev => [...prev, project]);
+    setCurrentProject(project);
+    setNewProjectName('');
+    setShowCreateProject(false);
+  };
+
+  const joinProject = (project) => {
+    setCurrentProject(project);
+    setMessages(project.messages || []);
+    setTasks(project.tasks || []);
+  };
+
   const toggleTask = (id) => {
     setTasks(prev => prev.map(task => 
       task.id === id ? { ...task, done: !task.done } : task
@@ -103,10 +131,61 @@ const AppNew = () => {
         </div>
 
         {connected ? (
-          <div className="grid grid-cols-3 gap-4 h-[80vh]">
+          <div className="grid grid-cols-4 gap-4 h-[80vh]">
+            {/* Projects Sidebar */}
+            <div className="border border-white/20 rounded p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg">Projects</h2>
+                <button 
+                  onClick={() => setShowCreateProject(true)}
+                  className="text-xs px-2 py-1 border border-white/20"
+                >
+                  +
+                </button>
+              </div>
+              
+              {showCreateProject && (
+                <div className="mb-4 p-2 border border-white/20 rounded">
+                  <input
+                    value={newProjectName}
+                    onChange={(e) => setNewProjectName(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && createProject()}
+                    className="w-full p-1 bg-black border border-white/20 text-white mb-2 text-sm"
+                    placeholder="Project name"
+                  />
+                  <div className="flex gap-1">
+                    <button onClick={createProject} className="text-xs px-2 py-1 border border-white/20">Create</button>
+                    <button onClick={() => setShowCreateProject(false)} className="text-xs px-2 py-1 border border-white/20">Cancel</button>
+                  </div>
+                </div>
+              )}
+              
+              <div className="space-y-2">
+                <div 
+                  onClick={() => {setCurrentProject(null); setMessages([]); setTasks([]);}}
+                  className={`p-2 border border-white/20 rounded cursor-pointer text-sm ${
+                    !currentProject ? 'bg-white/10' : 'hover:bg-white/5'
+                  }`}
+                >
+                  # General
+                </div>
+                {projects.map(project => (
+                  <div 
+                    key={project.id}
+                    onClick={() => joinProject(project)}
+                    className={`p-2 border border-white/20 rounded cursor-pointer text-sm ${
+                      currentProject?.id === project.id ? 'bg-white/10' : 'hover:bg-white/5'
+                    }`}
+                  >
+                    🚀 {project.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Chat */}
             <div className="col-span-2 border border-white/20 rounded p-4 flex flex-col">
-              <h2 className="text-lg mb-4">Chat</h2>
+              <h2 className="text-lg mb-4">{currentProject ? `${currentProject.name}` : 'General Chat'}</h2>
               <div className="flex-1 overflow-y-auto space-y-2 mb-4">
                 {messages.map(msg => (
                   <div key={msg.id} className="p-2 border border-white/20 rounded">
