@@ -24,8 +24,15 @@ const Chat = ({ walletAddress, socket }) => {
       const handleMessage = (message) => {
         try {
           // Only add messages from other users (not yourself)
-          if (message && message.content && message.sender !== walletAddress) {
-            setMessages(prev => [...prev, message]);
+          if (message && message.content && message.sender && message.sender !== walletAddress) {
+            const safeMessage = {
+              id: message.id || Date.now(),
+              sender: message.sender,
+              content: message.content,
+              timestamp: message.timestamp ? new Date(message.timestamp) : new Date(),
+              type: message.type || 'user'
+            };
+            setMessages(prev => [...prev, safeMessage]);
           }
         } catch (error) {
           console.error('Handle message error:', error);
@@ -34,11 +41,11 @@ const Chat = ({ walletAddress, socket }) => {
 
       const handleUserJoined = (data) => {
         try {
-          if (data.walletAddress !== walletAddress) {
+          if (data && data.walletAddress && data.walletAddress !== walletAddress) {
             const joinMessage = {
               id: Date.now(),
               sender: 'SYSTEM',
-              content: `${data.walletAddress?.slice(0, 8)}... joined the chat`,
+              content: `${data.walletAddress.slice(0, 8)}... joined the chat`,
               timestamp: new Date(),
               type: 'system'
             };
