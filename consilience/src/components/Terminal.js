@@ -38,8 +38,11 @@ const Terminal = () => {
       }
       
       // Load user projects
-      const projects = projectService.getUserProjects(walletAddress);
-      setUserProjects(projects);
+      const loadUserProjects = async () => {
+        const projects = await projectService.getUserProjects(walletAddress);
+        setUserProjects(projects);
+      };
+      loadUserProjects();
     }
   }, [connected, publicKey, refreshTrigger]);
 
@@ -228,7 +231,10 @@ const Terminal = () => {
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}
         walletAddress={publicKey?.toString()}
-        onSave={(profile) => setUserProfile(profile)}
+        onSave={(profile) => {
+        setUserProfile(profile);
+        projectService.saveUserProfile(publicKey?.toString(), profile);
+      }}
       />
       
       {/* Project Modal */}

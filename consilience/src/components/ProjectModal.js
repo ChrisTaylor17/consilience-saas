@@ -30,26 +30,28 @@ const ProjectModal = ({ isOpen, onClose, walletAddress, onProjectCreated }) => {
     }));
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!project.name || !project.type) return;
 
-    const newProject = projectService.createProject({
+    const newProject = await projectService.createProject({
       ...project,
       creator: walletAddress
     });
 
-    onProjectCreated(newProject);
-    onClose();
-    
-    // Reset form
-    setProject({
-      name: '',
-      description: '',
-      type: '',
-      skills: [],
-      teamSize: 3,
-      duration: '8-12 weeks'
-    });
+    if (newProject) {
+      onProjectCreated(newProject);
+      onClose();
+      
+      // Reset form
+      setProject({
+        name: '',
+        description: '',
+        type: '',
+        skills: [],
+        teamSize: 3,
+        duration: '8-12 weeks'
+      });
+    }
   };
 
   if (!isOpen) return null;

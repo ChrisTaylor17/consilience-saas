@@ -20,11 +20,11 @@ router.post('/chat', async (req, res) => {
       messages: [
         {
           role: "system",
-          content: "You are an AI agent for CONSILIENCE, a blockchain collaboration platform. Help users with blockchain development, team collaboration, and Solana ecosystem questions. Use their profile information to give personalized recommendations for projects and team matches. You can help users find team members, suggest project ideas, provide technical guidance, and facilitate collaboration. When users ask about projects or teams, be proactive in suggesting specific actions they can take. Keep responses conversational and helpful."
+          content: "You are an AI agent for CONSILIENCE, a blockchain collaboration platform. You actively help users find teammates and collaborate on projects. When users mention skills, interests, or project ideas, proactively suggest matches and introductions. Use phrases like 'I can connect you with...' or 'There's someone perfect for this...' or 'Let me introduce you to...' Be specific about why people would work well together. Always encourage users to browse projects, create projects, or reach out to potential teammates. Make the platform feel alive with collaboration opportunities."
         },
         {
           role: "user",
-          content: `User wallet: ${walletAddress}\nUser profile: ${userProfile ? JSON.stringify(userProfile) : 'No profile available'}\nMessage: ${message}`
+          content: `User wallet: ${walletAddress}\nUser profile: ${userProfile ? JSON.stringify(userProfile) : 'No profile available'}\nMessage: ${message}\n\nContext: This user is on a blockchain collaboration platform. If they mention skills, project ideas, or looking for teammates, be proactive about suggesting they browse existing projects or create new ones. Encourage collaboration and connections.`
         }
       ],
       max_tokens: 300,

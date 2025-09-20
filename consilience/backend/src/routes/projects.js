@@ -1,77 +1,96 @@
 const express = require('express');
-const { projectService } = require('../services/projectService');
 const router = express.Router();
 
-// Get user's projects
-router.get('/user/:walletAddress', async (req, res) => {
-  try {
-    const { walletAddress } = req.params;
-    const projects = await projectService.getUserProjects(walletAddress);
-    res.json(projects);
-  } catch (error) {
-    console.error('Get user projects error:', error);
-    res.status(500).json({ error: 'FAILED TO RETRIEVE PROJECTS' });
-  }
+// In-memory storage (would be database in production)
+let projects = {};
+let userProfiles = {};
+
+// Get all projects
+router.get('/', (req, res) => {
+  res.json(Object.values(projects));
 });
 
-// Create new project
-router.post('/', async (req, res) => {
+// Create project
+router.post('/', (req, res) => {
   try {
-    const { name, description, creatorWallet, teamMembers, projectType } = req.body;
+    const { project, walletAddress } = req.body;
+    const projectId = `project_${Date.now()}`;
     
-    const project = await projectService.createProject({
-      name,
-      description,
-      creatorWallet,
-      teamMembers: teamMembers || [creatorWallet],
-      projectType: projectType || 'GENERAL',
-      status: 'ACTIVE',
+    const newProject = {
+      id: projectId,
+      ...project,
+      creator: walletAddress,
+      members: [walletAddress],
+      status: 'recruiting',
       createdAt: new Date().toISOString(),
-      tasks: [],
-      tokenAllocations: {}
-    });
+      channelId: `project-${projectId}`
+    };
     
-    res.json(project);
+    projects[projectId] = newProject;
+    
+    res.json({ success: true, project: newProject });
   } catch (error) {
     console.error('Create project error:', error);
-    res.status(500).json({ error: 'FAILED TO CREATE PROJECT' });
+    res.status(500).json({ error: 'Failed to create project' });
   }
 });
 
-// Add task to project
-router.post('/:projectId/tasks', async (req, res) => {
+// Join project
+router.post('/:projectId/join', (req, res) => {
   try {
     const { projectId } = req.params;
-    const { title, description, assignedTo, tokenReward } = req.body;
+    const { walletAddress } = req.body;
     
-    const task = await projectService.addTask(projectId, {
-      title,
-      description,
-      assignedTo,
-      tokenReward: tokenReward || 10,
-      status: 'PENDING',
-      createdAt: new Date().toISOString()
-    });
+    const project = projects[projectId];
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
     
-    res.json(task);
+    if (!project.members.includes(walletAddress)) {
+      project.members.push(walletAddress);
+      
+      // Update status if team is full
+      if (project.members.length >= project.teamSize) {
+        project.status = 'active';
+      }
+    }
+    
+    res.json({ success: true, project });
   } catch (error) {
-    console.error('Add task error:', error);
-    res.status(500).json({ error: 'FAILED TO ADD TASK' });
+    console.error('Join project error:', error);
+    res.status(500).json({ error: 'Failed to join project' });
   }
 });
 
-// Complete task
-router.post('/:projectId/tasks/:taskId/complete', async (req, res) => {
+// Get user projects
+router.get('/user/:walletAddress', (req, res) => {
   try {
-    const { projectId, taskId } = req.params;
-    const { completedBy } = req.body;
-    
-    const result = await projectService.completeTask(projectId, taskId, completedBy);
-    res.json(result);
+    const { walletAddress } = req.params;
+    const userProjects = Object.values(projects).filter(project => 
+      project.members.includes(walletAddress)
+    );
+    res.json(userProjects);
   } catch (error) {
-    console.error('Complete task error:', error);
-    res.status(500).json({ error: 'FAILED TO COMPLETE TASK' });
+    console.error('Get user projects error:', error);
+    res.status(500).json({ error: 'Failed to get user projects' });
   }
+});
+
+// Save user profile
+router.post('/profile', (req, res) => {
+  try {
+    const { walletAddress, profile } = req.body;
+    userProfiles[walletAddress] = profile;
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Save profile error:', error);
+    res.status(500).json({ error: 'Failed to save profile' });
+  }
+});
+
+// Get all user profiles (for matching)
+router.get('/profiles', (req, res) => {
+  res.json(userProfiles);
 });
 
 module.exports = router;

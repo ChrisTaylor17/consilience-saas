@@ -1,97 +1,76 @@
 class ProjectService {
   constructor() {
-    this.projects = this.loadProjects();
-    this.initBroadcastChannel();
+    // No local storage needed - everything is server-side now
   }
 
-  loadProjects() {
+  async saveUserProfile(walletAddress, profile) {
     try {
-      // Try to load from shared storage first, then fallback to local
-      const shared = localStorage.getItem('consilience_shared_projects');
-      const local = localStorage.getItem('consilience_projects');
-      
-      const sharedProjects = shared ? JSON.parse(shared) : {};
-      const localProjects = local ? JSON.parse(local) : {};
-      
-      // Merge both storages
-      return { ...localProjects, ...sharedProjects };
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3003/api'}/projects/profile`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress, profile })
+      });
+      return await response.json();
     } catch (error) {
-      return {};
+      console.error('Save profile error:', error);
+      return { success: false };
     }
   }
 
-  saveProjects() {
-    // Save to both local and shared storage
-    localStorage.setItem('consilience_projects', JSON.stringify(this.projects));
-    localStorage.setItem('consilience_shared_projects', JSON.stringify(this.projects));
-    
-    // Broadcast project update to other users
-    if (window.broadcastChannel) {
-      window.broadcastChannel.postMessage({ type: 'projects_updated', projects: this.projects });
+  async createProject(projectData) {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3003/api'}/projects`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ project: projectData, walletAddress: projectData.creator })
+      });
+      const result = await response.json();
+      return result.project;
+    } catch (error) {
+      console.error('Create project error:', error);
+      return null;
     }
-  }
-
-  initBroadcastChannel() {
-    if (typeof BroadcastChannel !== 'undefined') {
-      window.broadcastChannel = new BroadcastChannel('consilience_projects');
-      window.broadcastChannel.onmessage = (event) => {
-        if (event.data.type === 'projects_updated') {
-          this.projects = { ...this.projects, ...event.data.projects };
-          localStorage.setItem('consilience_shared_projects', JSON.stringify(event.data.projects));
-        }
-      };
-    }
-  }
-
-  createProject(projectData) {
-    const projectId = `project_${Date.now()}`;
-    const project = {
-      id: projectId,
-      name: projectData.name,
-      description: projectData.description,
-      type: projectData.type,
-      skills: projectData.skills || [],
-      teamSize: projectData.teamSize || 3,
-      duration: projectData.duration || '8-12 weeks',
-      status: 'recruiting',
-      creator: projectData.creator,
-      members: [projectData.creator],
-      roles: projectData.roles || [],
-      tasks: [],
-      createdAt: new Date().toISOString(),
-      channelId: `project-${projectId}`
-    };
-
-    this.projects[projectId] = project;
-    this.saveProjects();
-    return project;
   }
 
   getProject(projectId) {
     return this.projects[projectId];
   }
 
-  getAllProjects() {
-    return Object.values(this.projects);
-  }
-
-  getUserProjects(walletAddress) {
-    return Object.values(this.projects).filter(project => 
-      project.members.includes(walletAddress)
-    );
-  }
-
-  joinProject(projectId, walletAddress, role = 'member') {
-    const project = this.projects[projectId];
-    if (project && !project.members.includes(walletAddress)) {
-      project.members.push(walletAddress);
-      if (role !== 'member') {
-        project.roles.push({ walletAddress, role });
-      }
-      this.saveProjects();
-      return true;
+  async getAllProjects() {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3003/api'}/projects`);
+      const projects = await response.json();
+      return projects;
+    } catch (error) {
+      console.error('Get all projects error:', error);
+      return [];
     }
-    return false;
+  }
+
+  async getUserProjects(walletAddress) {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3003/api'}/projects/user/${walletAddress}`);
+      const projects = await response.json();
+      return projects;
+    } catch (error) {
+      console.error('Get user projects error:', error);
+      return [];
+    }
+  }
+
+  async joinProject(projectId, walletAddress) {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3003/api'}/projects/${projectId}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress })
+      });
+      const result = await response.json();
+      return result.success;
+    } catch (error) {
+      console.error('Join project error:', error);
+      return false;
+    }
   }
 
   addTask(projectId, task) {

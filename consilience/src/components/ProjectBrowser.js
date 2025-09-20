@@ -6,9 +6,12 @@ const ProjectBrowser = ({ walletAddress, onJoinProject }) => {
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
-    // Load all projects from shared storage
-    const projects = projectService.getAllProjects();
-    setAllProjects(projects);
+    // Load all projects from backend
+    const loadProjects = async () => {
+      const projects = await projectService.getAllProjects();
+      setAllProjects(projects);
+    };
+    loadProjects();
   }, []);
 
   const filteredProjects = allProjects.filter(project => {
@@ -18,11 +21,12 @@ const ProjectBrowser = ({ walletAddress, onJoinProject }) => {
     return project.type.toLowerCase().includes(filter.toLowerCase());
   });
 
-  const handleJoin = (project) => {
-    const success = projectService.joinProject(project.id, walletAddress);
+  const handleJoin = async (project) => {
+    const success = await projectService.joinProject(project.id, walletAddress);
     if (success) {
       onJoinProject(project);
-      setAllProjects(projectService.getAllProjects());
+      const projects = await projectService.getAllProjects();
+      setAllProjects(projects);
     }
   };
 
