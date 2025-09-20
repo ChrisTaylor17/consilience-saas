@@ -44,6 +44,11 @@ io.on('connection', (socket) => {
     console.log(`User ${socket.id} joined room ${roomId}`);
   });
 
+  socket.on('user_joined', (data) => {
+    socket.broadcast.emit('user_joined', data);
+    console.log(`User ${data.walletAddress} joined`);
+  });
+
   socket.on('message', (data) => {
     // Broadcast message to all clients in the room
     socket.broadcast.emit('message', data);

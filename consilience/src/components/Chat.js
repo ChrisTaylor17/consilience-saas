@@ -19,11 +19,46 @@ const Chat = ({ walletAddress, socket }) => {
     };
     setMessages([welcomeMessage]);
 
-    // Temporarily disable socket listeners to fix duplication
-    // TODO: Re-enable for multi-user chat once fixed
+    // Socket event listeners for real-time chat
     if (socket) {
+      const handleMessage = (message) => {
+        try {
+          // Only add messages from other users (not yourself)
+          if (message && message.content && message.sender !== walletAddress) {
+            setMessages(prev => [...prev, message]);
+          }
+        } catch (error) {
+          console.error('Handle message error:', error);
+        }
+      };
+
+      const handleUserJoined = (data) => {
+        try {
+          if (data.walletAddress !== walletAddress) {
+            const joinMessage = {
+              id: Date.now(),
+              sender: 'SYSTEM',
+              content: `${data.walletAddress?.slice(0, 8)}... joined the chat`,
+              timestamp: new Date(),
+              type: 'system'
+            };
+            setMessages(prev => [...prev, joinMessage]);
+          }
+        } catch (error) {
+          console.error('Handle user joined error:', error);
+        }
+      };
+
+      socket.on('message', handleMessage);
+      socket.on('user_joined', handleUserJoined);
       socket.on('error', (error) => console.error('Socket error:', error));
+
+      // Announce user joined
+      socket.emit('user_joined', { walletAddress });
+
       return () => {
+        socket.off('message', handleMessage);
+        socket.off('user_joined', handleUserJoined);
         socket.off('error');
       };
     }
@@ -51,8 +86,10 @@ const Chat = ({ walletAddress, socket }) => {
       setInputValue('');
       setIsTyping(true);
 
-      // Temporarily disable socket emit to fix duplication
-      // TODO: Re-enable for multi-user chat once fixed
+      // Emit user message to other users
+      if (socket && socket.connected) {
+        socket.emit('message', userMessage);
+      }
 
       // Only process AI response for the sender, not all users
       try {
