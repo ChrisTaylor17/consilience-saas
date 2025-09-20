@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import Chat from './Chat';
+import SimpleChat from './SimpleChat';
 import WalletInfo from './WalletInfo';
 import ChannelSidebar from './ChannelSidebar';
 import UserProfileModal from './UserProfileModal';
@@ -192,10 +192,9 @@ const Terminal = () => {
                       />
                     </div>
                   ) : (
-                    <Chat 
+                    <SimpleChat 
                       walletAddress={publicKey?.toString()} 
-                      socket={socket} 
-                      currentChannel={currentChannel}
+                      socket={socket}
                     />
                   )}
                 </div>
