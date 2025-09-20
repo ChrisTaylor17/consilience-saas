@@ -12,8 +12,8 @@ router.post('/chat', async (req, res) => {
   try {
     const { message, walletAddress } = req.body;
 
-    // Get user context
-    const userProfile = await userService.getUserProfile(walletAddress);
+    // Skip user profile for now (no AWS credentials)
+    const userProfile = null;
     
     // Call OpenAI API
     console.log('Calling OpenAI with message:', message);
