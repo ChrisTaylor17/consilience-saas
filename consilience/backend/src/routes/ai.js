@@ -16,6 +16,8 @@ router.post('/chat', async (req, res) => {
     const userProfile = await userService.getUserProfile(walletAddress);
     
     // Call OpenAI API
+    console.log('Calling OpenAI with message:', message);
+    
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
@@ -31,6 +33,8 @@ router.post('/chat', async (req, res) => {
       max_tokens: 300,
       temperature: 0.7
     });
+    
+    console.log('OpenAI response:', completion.choices[0]?.message?.content);
     
     res.json({
       response: completion.choices[0]?.message?.content || 'AI response unavailable'
