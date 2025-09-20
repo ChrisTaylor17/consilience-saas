@@ -34,55 +34,88 @@ const WalletInfo = ({ walletAddress }) => {
 
   if (loading) {
     return (
-      <div className="retro-panel p-4 h-full flex items-center justify-center">
+      <div className="bubble-panel p-6 h-full flex items-center justify-center">
         <div className="text-center">
-          <div className="text-lg neon-glow mb-2">LOADING WALLET DATA</div>
-          <div className="cursor"></div>
+          <div className="text-4xl mb-4 floating">🦄</div>
+          <p className="text-lg text-purple-600 font-semibold">Loading magical data... ✨</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Wallet Status */}
-      <div className="retro-panel p-4">
-        <div className="text-sm font-bold mb-2 neon-glow uppercase tracking-wider">WALLET STATUS</div>
-        <div className="space-y-1 text-xs font-mono">
-          <div>ADDRESS: {walletAddress?.slice(0, 8)}...{walletAddress?.slice(-8)}</div>
-          <div className="text-white">BALANCE: {walletData.balance.toFixed(4)} SOL</div>
-          <div className="text-white">TOKENS: {walletData.tokens.length}</div>
+      <div className="bubble-panel p-6 sparkle">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="text-3xl">💰</div>
+          <h3 className="text-xl font-bold text-purple-600">Magical Wallet ✨</h3>
+        </div>
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-purple-500 font-medium">Address</span>
+            <span className="text-sm font-mono text-purple-700">{walletAddress?.slice(0, 8)}...{walletAddress?.slice(-8)}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-purple-500 font-medium">Balance</span>
+            <span className="font-bold text-purple-700">{walletData.balance.toFixed(4)} SOL 💎</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-purple-500 font-medium">Tokens</span>
+            <span className="font-bold text-purple-700">{walletData.tokens.length} 🌈</span>
+          </div>
         </div>
       </div>
 
-      {/* Recent Transactions */}
-      <div className="retro-panel p-4">
-        <div className="text-sm font-bold mb-2 neon-glow uppercase tracking-wider">RECENT TRANSACTIONS</div>
-        <div className="space-y-2 text-xs max-h-40 overflow-y-auto font-mono">
+      {/* Recent Activity */}
+      <div className="bubble-panel p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="text-3xl">🎆</div>
+          <h3 className="text-xl font-bold text-purple-600">Recent Magic ✨</h3>
+        </div>
+        <div className="space-y-3 max-h-48 overflow-y-auto">
           {walletData.transactions.length > 0 ? (
             walletData.transactions.slice(0, 5).map((tx, index) => (
-              <div key={index} className="border-b border-gray-600 pb-1">
-                <div className="text-white">HASH: {tx.signature?.slice(0, 8)}...</div>
-                <div>TYPE: {tx.type || 'UNKNOWN'}</div>
-                <div>TIME: {new Date(tx.blockTime * 1000).toLocaleTimeString()}</div>
+              <div key={index} className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-2xl p-4 border border-pink-200">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-xs font-mono text-purple-600">{tx.signature?.slice(0, 12)}...</span>
+                  <span className="text-xs text-purple-500">{new Date(tx.blockTime * 1000).toLocaleTimeString()}</span>
+                </div>
+                <div className="text-sm font-medium text-purple-700">🌈 {tx.type || 'Transaction'}</div>
               </div>
             ))
           ) : (
-            <div className="text-center py-4 text-white">
-              NO RECENT TRANSACTIONS
+            <div className="text-center py-8 text-purple-500">
+              <div className="text-4xl mb-3">🦄</div>
+              <p className="font-medium">No magical transactions yet!</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Project Status */}
-      <div className="retro-panel p-4">
-        <div className="text-sm font-bold mb-2 neon-glow uppercase tracking-wider">PROJECT STATUS</div>
-        <div className="space-y-1 text-xs font-mono">
-          <div className="text-white">ACTIVE PROJECTS: 0</div>
-          <div className="text-white">COMPLETED TASKS: 0</div>
-          <div className="text-white">EARNED TOKENS: 0</div>
-          <div className="text-white">TEAM MATCHES: 0</div>
+      {/* Project Stats */}
+      <div className="bubble-panel p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="text-3xl">🏆</div>
+          <h3 className="text-xl font-bold text-purple-600">Unicorn Stats 🦄</h3>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="text-center p-4 bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl border border-pink-200">
+            <div className="text-2xl font-bold text-purple-600">0</div>
+            <div className="text-xs text-purple-500 font-medium">Active Projects 🌈</div>
+          </div>
+          <div className="text-center p-4 bg-gradient-to-br from-yellow-100 to-pink-100 rounded-2xl border border-pink-200">
+            <div className="text-2xl font-bold text-purple-600">0</div>
+            <div className="text-xs text-purple-500 font-medium">Completed ✨</div>
+          </div>
+          <div className="text-center p-4 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl border border-pink-200">
+            <div className="text-2xl font-bold text-purple-600">0</div>
+            <div className="text-xs text-purple-500 font-medium">Tokens Earned 💫</div>
+          </div>
+          <div className="text-center p-4 bg-gradient-to-br from-pink-100 to-yellow-100 rounded-2xl border border-pink-200">
+            <div className="text-2xl font-bold text-purple-600">0</div>
+            <div className="text-xs text-purple-500 font-medium">Team Matches 💖</div>
+          </div>
         </div>
       </div>
     </div>

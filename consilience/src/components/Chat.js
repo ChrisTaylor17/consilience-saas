@@ -96,36 +96,48 @@ const Chat = ({ walletAddress, socket }) => {
 
 
   return (
-    <div className="retro-panel h-full flex flex-col">
+    <div className="bubble-panel h-full flex flex-col">
       {/* Messages Area */}
-      <div className="flex-1 p-4 overflow-y-auto">
+      <div className="flex-1 p-6 overflow-y-auto space-y-4">
         {messages.map((message) => (
-          <div key={message.id} className="mb-2">
-            <div className={`p-2 ${
-              message.type === 'user' ? 'message-user' :
-              message.type === 'ai' ? 'message-ai' :
-              'message-system'
-            }`}>
-              <div className="text-xs mb-1 uppercase tracking-wide">
-                [{message.timestamp ? message.timestamp.toLocaleTimeString() : new Date().toLocaleTimeString()}] 
-                {message.type === 'system' ? '[SYSTEM]' : 
-                 message.type === 'ai' ? '[AI_AGENT]' : 
-                 `[${message.sender?.slice(0, 8)}...]`}
-              </div>
-              <div className="text-sm whitespace-pre-wrap font-mono">
-                {message.content}
+          <div key={message.id} className="flex items-start gap-3">
+            <div className="text-2xl">
+              {message.type === 'user' ? '😊' :
+               message.type === 'ai' ? '🦄' : '✨'}
+            </div>
+            <div className="flex-1">
+              <div className={`p-4 max-w-md ${
+                message.type === 'user' ? 'message-bubble-user ml-auto' :
+                message.type === 'ai' ? 'message-bubble-ai' :
+                'message-bubble-system'
+              }`}>
+                <div className="text-xs mb-2 opacity-75 font-medium">
+                  {message.type === 'system' ? '✨ System' : 
+                   message.type === 'ai' ? '🦄 AI Unicorn' : 
+                   `😊 ${message.sender?.slice(0, 8)}...`} • 
+                  {message.timestamp ? message.timestamp.toLocaleTimeString() : new Date().toLocaleTimeString()}
+                </div>
+                <div className="text-sm whitespace-pre-wrap leading-relaxed font-medium">
+                  {message.content}
+                </div>
               </div>
             </div>
           </div>
         ))}
         {isTyping && (
-          <div className="mb-2">
-            <div className="message-ai p-2">
-              <div className="text-xs mb-1 uppercase tracking-wide">
-                [{new Date().toLocaleTimeString()}] [AI_AGENT]
+          <div className="flex items-start gap-3">
+            <div className="text-2xl">🦄</div>
+            <div className="message-bubble-ai p-4 max-w-md">
+              <div className="text-xs mb-2 opacity-75 font-medium">
+                🦄 AI Unicorn • {new Date().toLocaleTimeString()}
               </div>
-              <div className="text-sm font-mono">
-                PROCESSING<span className="cursor"></span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Thinking magical thoughts</span>
+                <div className="typing-indicator">
+                  <div className="typing-dot"></div>
+                  <div className="typing-dot"></div>
+                  <div className="typing-dot"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -134,24 +146,25 @@ const Chat = ({ walletAddress, socket }) => {
       </div>
 
       {/* Input Area */}
-      <div className="neon-border border-t p-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm neon-glow">></span>
+      <div className="p-6 border-t border-pink-200">
+        <div className="flex items-center gap-3">
+          <div className="text-2xl">😊</div>
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="flex-1 retro-input p-2 text-sm font-mono uppercase"
-            placeholder="TYPE YOUR MESSAGE..."
+            className="flex-1 cute-input"
+            placeholder="Share your magical thoughts... ✨"
             maxLength={500}
           />
           <button
             onClick={handleSendMessage}
-            className="btn-retro text-xs"
+            className="btn-cute flex items-center gap-2"
             disabled={!inputValue.trim()}
           >
-            SEND
+            <span>Send</span>
+            <span>🌈</span>
           </button>
         </div>
       </div>
