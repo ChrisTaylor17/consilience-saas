@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import SimpleChat from './SimpleChat';
-import SimpleTasks from './SimpleTasks';
+import TaskPanel from './TaskPanel';
 import SimpleMatching from './SimpleMatching';
 import WalletInfo from './WalletInfo';
 import ChannelSidebar from './ChannelSidebar';
@@ -186,49 +186,7 @@ const Terminal = () => {
                   )}
                 </div>
                 
-                {/* Task Panel - Force New Component */}
-                <div className="w-80 border-l border-white/20">
-                  <div className="p-4">
-                    <h3 className="text-lg mb-4 text-white">Simple Tasks</h3>
-                    
-                    <div className="mb-4">
-                      <input
-                        id="task-input"
-                        className="w-full p-2 bg-black border border-white/20 text-white mb-2"
-                        placeholder="Add new task..."
-                      />
-                      <button 
-                        onClick={() => {
-                          const input = document.getElementById('task-input');
-                          const taskText = input.value.trim();
-                          if (taskText) {
-                            const taskList = document.getElementById('task-list');
-                            const taskDiv = document.createElement('div');
-                            taskDiv.className = 'p-2 border border-white/20 rounded mb-2 text-white';
-                            taskDiv.innerHTML = `
-                              <div class="flex justify-between items-center">
-                                <span>${taskText}</span>
-                                <button onclick="this.parentElement.parentElement.remove()" class="text-xs px-2 py-1 border border-white/20 text-white">Done</button>
-                              </div>
-                            `;
-                            taskList.appendChild(taskDiv);
-                            input.value = '';
-                          }
-                        }}
-                        className="px-3 py-1 border border-white/20 text-white hover:bg-white/10"
-                      >
-                        Add Task
-                      </button>
-                    </div>
-
-                    <div>
-                      <h4 className="text-sm text-white/60 mb-2">Tasks</h4>
-                      <div id="task-list" className="space-y-2">
-                        {/* Tasks will be added here */}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <TaskPanel />
               </div>
             </div>
           ) : (
