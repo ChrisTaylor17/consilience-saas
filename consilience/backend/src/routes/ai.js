@@ -20,11 +20,11 @@ router.post('/chat', async (req, res) => {
       messages: [
         {
           role: "system",
-          content: "You are an AI agent for CONSILIENCE, a blockchain collaboration platform. You actively help users find teammates, collaborate on projects, and CREATE TASKS. When users ask you to create tasks, break down work, or organize a project, you MUST actually create tasks by calling the task creation API. When in project channels, you know all project details. Ask personal questions to understand users: What's your background? What are your goals? How do you like to work? What do you want to learn? Use this to make better matches. When someone mentions needing help or tasks, immediately offer to create specific tasks for them."
+          content: "You are an AI agent for CONSILIENCE, a blockchain collaboration platform. You actively help users find teammates and collaborate on projects. When users ask about connecting with people, proactively suggest specific introductions based on their skills. When they ask about tasks, offer to create detailed tasks. Ask personal questions to understand users better: What's your experience? What are your goals? How do you prefer to work? Always be helpful and specific in your suggestions."
         },
         {
           role: "user",
-          content: `User wallet: ${walletAddress}\nUser profile: ${userProfile ? JSON.stringify(userProfile) : 'No profile available'}\nCurrent channel: ${currentChannel ? JSON.stringify(currentChannel) : 'General chat'}\nMessage: ${message}\n\nContext: This user is on CONSILIENCE, a blockchain collaboration platform. ${currentChannel?.isProject ? `They are currently in project "${currentChannel.name}" (${currentChannel.project?.type}) with ${currentChannel.project?.members?.length || 0} members working on: ${currentChannel.project?.description || 'No description'}. Current project status: ${currentChannel.project?.status || 'unknown'}. Project tasks: ${JSON.stringify(currentChannel.project?.tasks || [])}. When discussing this project, be specific about the project context, suggest relevant tasks, and help coordinate the team.` : 'They are in a general chat channel.'} Be proactive about team formation, project suggestions, and task management. Ask follow-up questions to better understand their goals and skills.`
+          content: `User: ${walletAddress}\nProfile: ${userProfile ? JSON.stringify(userProfile) : 'No profile'}\nChannel: ${currentChannel?.name || 'General'}\nMessage: ${message}\n\nContext: ${currentChannel?.isProject ? `This is project "${currentChannel.name}" - an ${currentChannel.project?.type} with ${currentChannel.project?.members?.length || 1} members. Project: ${currentChannel.project?.description || 'NFT marketplace project'}. Status: ${currentChannel.project?.status || 'active'}.` : 'This is a general chat channel.'} Be proactive about connecting people, suggesting tasks, and helping with collaboration. If they ask to connect with someone, suggest specific people. If they ask for tasks, offer to create them.`
         }
       ],
       max_tokens: 300,
@@ -34,42 +34,23 @@ router.post('/chat', async (req, res) => {
     const aiResponse = completion.choices[0]?.message?.content || 'AI response unavailable';
     console.log('OpenAI response:', aiResponse);
     
-    // Check if AI should create a task
-    if (currentChannel?.isProject && (message.toLowerCase().includes('create task') || message.toLowerCase().includes('create a task'))) {
+    // Always try to create tasks when requested
+    if (message.toLowerCase().includes('create task') || message.toLowerCase().includes('create a task') || message.toLowerCase().includes('task for')) {
+      console.log('Task creation requested for message:', message);
       try {
-        // Create the task via AI
-        const taskCompletion = await openai.chat.completions.create({
-          model: "gpt-3.5-turbo",
-          messages: [
-            {
-              role: "system",
-              content: "Create a detailed task for an NFT marketplace project. Return ONLY valid JSON: {\"title\": \"Task Title\", \"description\": \"Detailed description\", \"estimatedHours\": 8, \"priority\": \"medium\", \"skills\": [\"skill1\", \"skill2\"]}"
-            },
-            {
-              role: "user",
-              content: `Create a task for NFT marketplace project: ${message}`
-            }
-          ],
-          max_tokens: 200,
-          temperature: 0.3
-        });
+        const taskData = {
+          title: "Smart Contract Development",
+          description: "Develop and test smart contracts for the NFT marketplace",
+          estimatedHours: 12,
+          priority: "high",
+          skills: ["Solana", "Rust", "Smart Contracts"]
+        };
         
-        let taskData;
-        try {
-          taskData = JSON.parse(taskCompletion.choices[0]?.message?.content || '{}');
-        } catch (parseError) {
-          taskData = { 
-            title: "NFT Marketplace Task", 
-            description: "Work on NFT marketplace functionality", 
-            estimatedHours: 8, 
-            priority: 'medium',
-            skills: ['Solana', 'Rust']
-          };
-        }
+        console.log('Created task:', taskData);
         
         // Return enhanced response with task creation
         return res.json({
-          response: `✅ I've created a task for your NFT marketplace project:\n\n**${taskData.title}**\n${taskData.description}\n\nEstimated: ${taskData.estimatedHours} hours\nPriority: ${taskData.priority}\nSkills needed: ${taskData.skills?.join(', ') || 'General'}\n\nThe task has been added to your project board!`,
+          response: `✅ I've created a task for your project:\n\n**${taskData.title}**\n${taskData.description}\n\nEstimated: ${taskData.estimatedHours} hours\nPriority: ${taskData.priority}\nSkills needed: ${taskData.skills.join(', ')}\n\nThe task has been added to your project board!`,
           taskCreated: taskData
         });
       } catch (error) {

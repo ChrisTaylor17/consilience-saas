@@ -51,9 +51,9 @@ const Chat = ({ walletAddress, socket, currentChannel }) => {
         try {
           const { message, channel } = data;
           // Add messages from other users OR AI responses in the same channel
+          console.log('Received message:', message, 'from channel:', channel, 'current:', currentChannel.id);
           if (message && message.content && message.sender && 
-              (message.sender !== walletAddress || message.sender === 'AI_AGENT') && 
-              channel === currentChannel.id) {
+              message.sender !== walletAddress && channel === currentChannel.id) {
             const safeMessage = {
               id: message.id || Date.now(),
               sender: message.sender,
@@ -175,6 +175,7 @@ const Chat = ({ walletAddress, socket, currentChannel }) => {
             
             // Broadcast AI response to other users in public channels
             if (socket && socket.connected) {
+              console.log('Broadcasting AI response:', aiMessage);
               socket.emit('message', { message: aiMessage, channel: currentChannel.id });
             }
           }
