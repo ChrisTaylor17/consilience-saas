@@ -7,9 +7,16 @@ class AIService {
 
   async processMessage(message, walletAddress) {
     try {
-      // Call OpenAI API for all messages
+      // Only process messages that start with /ai or @ai
+      if (!message.toLowerCase().startsWith('/ai ') && !message.toLowerCase().startsWith('@ai ')) {
+        return null; // Don't respond to regular chat messages
+      }
+
+      // Remove the /ai or @ai prefix
+      const cleanMessage = message.replace(/^(\/ai |@ai )/i, '').trim();
+      
       const response = await axios.post(`${this.apiUrl}/ai/chat`, {
-        message,
+        message: cleanMessage,
         walletAddress,
         timestamp: new Date().toISOString()
       });

@@ -13,7 +13,7 @@ const Chat = ({ walletAddress, socket }) => {
     const welcomeMessage = {
       id: Date.now(),
       sender: 'AI_AGENT',
-      content: `Welcome to Consilience. I'm here to help you collaborate on blockchain projects and connect with teams.`,
+      content: `Welcome to Consilience. Type /ai or @ai followed by your message to chat with the AI assistant.`,
       timestamp: new Date(),
       type: 'system'
     };
@@ -98,29 +98,24 @@ const Chat = ({ walletAddress, socket }) => {
         socket.emit('message', userMessage);
       }
 
-      // Only process AI response for the sender, not all users
+      // Only process AI response if message was directed to AI
       try {
         const aiResponse = await aiService.processMessage(messageContent, walletAddress);
         
-        const aiMessage = {
-          id: Date.now() + 1,
-          sender: 'AI_AGENT',
-          content: aiResponse,
-          timestamp: new Date(),
-          type: 'ai'
-        };
+        // Only show AI response if there was one (message was directed to AI)
+        if (aiResponse) {
+          const aiMessage = {
+            id: Date.now() + 1,
+            sender: 'AI_AGENT',
+            content: aiResponse,
+            timestamp: new Date(),
+            type: 'ai'
+          };
 
-        setMessages(prev => [...prev, aiMessage]);
+          setMessages(prev => [...prev, aiMessage]);
+        }
       } catch (error) {
         console.error('AI response error:', error);
-        const errorMessage = {
-          id: Date.now() + 1,
-          sender: 'AI_AGENT',
-          content: 'ERROR: AI SERVICE UNAVAILABLE',
-          timestamp: new Date(),
-          type: 'ai'
-        };
-        setMessages(prev => [...prev, errorMessage]);
       } finally {
         setIsTyping(false);
       }
@@ -198,7 +193,7 @@ const Chat = ({ walletAddress, socket }) => {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             className="flex-1 minimal-input p-3 text-sm"
-            placeholder="Message..."
+            placeholder="Message... (use /ai for AI assistant)"
             maxLength={500}
           />
           <button
