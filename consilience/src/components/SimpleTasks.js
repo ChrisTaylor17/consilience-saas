@@ -5,7 +5,11 @@ const SimpleTasks = () => {
   const [newTask, setNewTask] = useState('');
 
   const addTask = () => {
-    if (!newTask.trim()) return;
+    console.log('Add task clicked, newTask:', newTask);
+    if (!newTask.trim()) {
+      console.log('Empty task, returning');
+      return;
+    }
     
     const task = {
       id: Date.now(),
@@ -13,7 +17,12 @@ const SimpleTasks = () => {
       status: 'todo'
     };
     
-    setTasks(prev => [...prev, task]);
+    console.log('Adding task:', task);
+    setTasks(prev => {
+      const updated = [...prev, task];
+      console.log('Updated tasks:', updated);
+      return updated;
+    });
     setNewTask('');
   };
 

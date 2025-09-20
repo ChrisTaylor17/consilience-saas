@@ -50,9 +50,10 @@ io.on('connection', (socket) => {
   });
 
   socket.on('message', (data) => {
-    console.log('Server received message:', data);
-    // Broadcast to ALL clients (including sender for AI responses)
+    console.log('SERVER: Received message from client:', data);
+    // Broadcast to ALL clients
     io.emit('message', data);
+    console.log('SERVER: Broadcasted message to all clients');
   });
 
   socket.on('disconnect', () => {

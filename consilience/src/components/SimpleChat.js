@@ -6,14 +6,16 @@ const SimpleChat = ({ walletAddress, socket }) => {
 
   useEffect(() => {
     if (socket) {
+      console.log('Setting up socket listener');
       socket.on('message', (data) => {
-        console.log('Received message:', data);
-        if (data.message) {
+        console.log('CLIENT: Received message:', data);
+        if (data.message && data.message.sender !== walletAddress) {
+          console.log('Adding message from other user:', data.message);
           setMessages(prev => [...prev, data.message]);
         }
       });
     }
-  }, [socket]);
+  }, [socket, walletAddress]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -30,6 +32,7 @@ const SimpleChat = ({ walletAddress, socket }) => {
 
     // Broadcast to others
     if (socket) {
+      console.log('CLIENT: Sending user message:', userMessage);
       socket.emit('message', { message: userMessage, channel: 'general' });
     }
 
@@ -59,7 +62,7 @@ const SimpleChat = ({ walletAddress, socket }) => {
         
         // Broadcast AI response to ALL users
         if (socket) {
-          console.log('Broadcasting AI message:', aiMessage);
+          console.log('CLIENT: Broadcasting AI message:', aiMessage);
           socket.emit('message', { message: aiMessage, channel: 'general' });
         }
       } catch (error) {
