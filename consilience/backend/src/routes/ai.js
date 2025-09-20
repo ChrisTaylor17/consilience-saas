@@ -66,4 +66,46 @@ router.post('/match-team', async (req, res) => {
   }
 });
 
+// AI Project Creation endpoint
+router.post('/create-project', async (req, res) => {
+  try {
+    const { projectData, walletAddress } = req.body;
+    
+    // Use AI to enhance project details
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "You are helping create a blockchain project. Generate a detailed project plan with tasks, timeline, and team roles based on the project description. Return JSON format with: {name, description, tasks: [{title, description, estimatedHours}], roles: [{title, description, skills}]}"
+        },
+        {
+          role: "user",
+          content: `Create a project plan for: ${JSON.stringify(projectData)}`
+        }
+      ],
+      max_tokens: 500,
+      temperature: 0.7
+    });
+    
+    let aiProject;
+    try {
+      aiProject = JSON.parse(completion.choices[0]?.message?.content || '{}');
+    } catch (parseError) {
+      aiProject = { name: projectData.name, description: projectData.description };
+    }
+    
+    res.json({
+      project: aiProject,
+      success: true
+    });
+  } catch (error) {
+    console.error('AI Project Creation Error:', error);
+    res.status(500).json({
+      error: 'PROJECT CREATION FAILED',
+      success: false
+    });
+  }
+});
+
 module.exports = router;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ChannelSidebar = ({ currentChannel, onChannelChange, walletAddress }) => {
+const ChannelSidebar = ({ currentChannel, onChannelChange, walletAddress, userProjects, onCreateProject }) => {
   const channels = [
     { id: 'general', name: 'general', description: 'Main discussion' },
     { id: 'project-ideas', name: 'project-ideas', description: 'Brainstorm projects' },
@@ -42,6 +42,50 @@ const ChannelSidebar = ({ currentChannel, onChannelChange, walletAddress }) => {
             </div>
           </button>
         ))}
+      </div>
+
+      {/* Projects */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="text-sm font-medium text-white/60">Projects</h4>
+          <button
+            onClick={onCreateProject}
+            className="text-xs text-white/40 hover:text-white/60 border border-white/20 px-2 py-1 rounded"
+          >
+            +
+          </button>
+        </div>
+        <div className="space-y-1">
+          {userProjects.map((project) => {
+            const projectChannel = {
+              id: project.channelId,
+              name: project.name,
+              description: `${project.type} • ${project.members.length}/${project.teamSize} members`,
+              isProject: true,
+              project: project
+            };
+            
+            return (
+              <button
+                key={project.id}
+                onClick={() => onChannelChange(projectChannel)}
+                className={`w-full text-left p-3 rounded transition-colors ${
+                  currentChannel?.id === projectChannel.id
+                    ? 'bg-white/10 text-white'
+                    : 'text-white/60 hover:text-white/80 hover:bg-white/5'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-white/40">🚀</span>
+                  <div>
+                    <div className="text-sm font-medium">{project.name}</div>
+                    <div className="text-xs text-white/40">{project.type}</div>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* AI Assistant */}

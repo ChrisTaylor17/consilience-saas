@@ -60,6 +60,20 @@ class AIService {
     }
   }
 
+  async createProject(projectData, walletAddress) {
+    try {
+      const response = await axios.post(`${this.apiUrl}/ai/create-project`, {
+        projectData,
+        walletAddress
+      });
+
+      return response.data.project || null;
+    } catch (error) {
+      console.error('Create project error:', error);
+      return null;
+    }
+  }
+
   getHelpMessage() {
     return `AVAILABLE COMMANDS:
 - HELP: SHOW THIS MESSAGE

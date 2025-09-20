@@ -5,28 +5,53 @@ import Chat from './Chat';
 import WalletInfo from './WalletInfo';
 import ChannelSidebar from './ChannelSidebar';
 import UserProfileModal from './UserProfileModal';
+import ProjectModal from './ProjectModal';
 import { useSocket } from '../hooks/useSocket';
+import { projectService } from '../services/projectService';
 
 const Terminal = () => {
   const { connected, publicKey } = useWallet();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentChannel, setCurrentChannel] = useState({ id: 'general', name: 'general', description: 'Main discussion' });
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showProjectModal, setShowProjectModal] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
+  const [userProjects, setUserProjects] = useState([]);
   const socket = useSocket();
 
-  // Check if user has a profile
+  // Check if user has a profile and load projects
   useEffect(() => {
     if (connected && publicKey) {
-      const savedProfile = localStorage.getItem(`profile_${publicKey.toString()}`);
+      const walletAddress = publicKey.toString();
+      
+      // Load profile
+      const savedProfile = localStorage.getItem(`profile_${walletAddress}`);
       if (savedProfile) {
         setUserProfile(JSON.parse(savedProfile));
       } else {
         // Show profile modal for new users
         setTimeout(() => setShowProfileModal(true), 2000);
       }
+      
+      // Load user projects
+      const projects = projectService.getUserProjects(walletAddress);
+      setUserProjects(projects);
     }
   }, [connected, publicKey]);
+
+  const handleProjectCreated = (project) => {
+    setUserProjects(prev => [...prev, project]);
+    
+    // Switch to the new project channel
+    const projectChannel = {
+      id: project.channelId,
+      name: project.name,
+      description: `${project.type} • ${project.members.length}/${project.teamSize} members`,
+      isProject: true,
+      project: project
+    };
+    setCurrentChannel(projectChannel);
+  };
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -67,6 +92,8 @@ const Terminal = () => {
             currentChannel={currentChannel}
             onChannelChange={setCurrentChannel}
             walletAddress={publicKey?.toString()}
+            userProjects={userProjects}
+            onCreateProject={() => setShowProjectModal(true)}
           />
         )}
 
@@ -138,6 +165,14 @@ const Terminal = () => {
         onClose={() => setShowProfileModal(false)}
         walletAddress={publicKey?.toString()}
         onSave={(profile) => setUserProfile(profile)}
+      />
+      
+      {/* Project Modal */}
+      <ProjectModal
+        isOpen={showProjectModal}
+        onClose={() => setShowProjectModal(false)}
+        walletAddress={publicKey?.toString()}
+        onProjectCreated={handleProjectCreated}
       />
     </div>
   );
