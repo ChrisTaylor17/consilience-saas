@@ -1,0 +1,84 @@
+{
+  "name": "consilience-professional",
+  "version": "8.0.0",
+  "private": true,
+  "description": "Professional AI-powered blockchain collaboration platform",
+  "keywords": ["blockchain", "solana", "collaboration", "ai", "web3"],
+  "author": "CONSILIENCE Team",
+  "license": "MIT",
+  "dependencies": {
+    "@craco/craco": "^7.1.0",
+    "@solana/spl-token": "^0.3.9",
+    "@solana/wallet-adapter-base": "^0.9.23",
+    "@solana/wallet-adapter-react": "^0.15.35",
+    "@solana/wallet-adapter-react-ui": "^0.9.35",
+    "@solana/wallet-adapter-wallets": "^0.19.32",
+    "@solana/web3.js": "^1.87.6",
+    "ajv": "^8.17.1",
+    "autoprefixer": "^10.4.16",
+    "aws-sdk": "^2.1498.0",
+    "axios": "^1.6.2",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
+    "lucide-react": "^0.294.0",
+    "postcss": "^8.4.32",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "socket.io-client": "^4.7.4",
+    "stream-browserify": "^3.0.0",
+    "tailwindcss": "^3.3.6"
+  },
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "react-scripts eject",
+    "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write src/**/*.{js,jsx,ts,tsx,json,css,md}",
+    "analyze": "npm run build && npx bundle-analyzer build/static/js/*.js",
+    "deploy:netlify": "npm run build && netlify deploy --prod --dir=build",
+    "deploy:vercel": "npm run build && vercel --prod"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "rules": {
+      "no-unused-vars": "warn",
+      "no-console": "warn",
+      "prefer-const": "error"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0",
+    "serverless": "^4.19.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/consilience.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/consilience/issues"
+  },
+  "homepage": "https://consilience.app"
+}
