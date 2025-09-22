@@ -1,280 +1,218 @@
-# CONSILIENCE Professional
+# CONSILIENCE
 
-> **AI-Powered Blockchain Collaboration Platform**
+AI-Powered Blockchain Collaboration Terminal
 
-A cutting-edge SaaS application that revolutionizes how teams collaborate on blockchain projects through intelligent AI matching, real-time communication, and seamless Solana integration.
+## Overview
 
-![CONSILIENCE](https://img.shields.io/badge/CONSILIENCE-Professional-blue?style=for-the-badge)
-![Version](https://img.shields.io/badge/version-8.0.0-green?style=for-the-badge)
-![License](https://img.shields.io/badge/license-MIT-orange?style=for-the-badge)
+CONSILIENCE is a SaaS application that uses AI to guide teams of users in collaborating on blockchain-focused projects, particularly on the Solana blockchain. The application features a retro, minimalist design inspired by old computer terminals with a black-and-white color scheme.
 
-## ✨ Features
+## Features
 
-### 🤖 AI-Powered Matching
-- **Smart Cofounder Discovery**: Advanced algorithms analyze communication patterns, skills, and project preferences
-- **Real-time Compatibility Scoring**: Dynamic matching based on complementary skills and collaboration styles
-- **Intelligent Team Formation**: AI suggests optimal team compositions for maximum success
+- **Wallet-Based Authentication**: Users authenticate using Solana wallet addresses
+- **AI-Powered Team Matching**: AI analyzes user data to match compatible team members
+- **Real-Time Chat Interface**: Terminal-style chat with AI agent participation
+- **Blockchain Integration**: Real-time Solana blockchain data and token operations
+- **Project Management**: Task tracking and token-based rewards
+- **Retro Terminal Design**: Monospace fonts, scanlines, and minimalist aesthetics
 
-### 🚀 Project Management
-- **Visual Project Dashboard**: Modern, intuitive interface for project creation and management
-- **Task Automation**: AI-generated tasks based on project requirements and team skills
-- **Progress Tracking**: Real-time analytics and performance metrics
-
-### 💬 Advanced Communication
-- **Real-time Chat**: WebSocket-powered instant messaging with typing indicators
-- **AI Assistant Integration**: Context-aware AI responses and suggestions
-- **Project-specific Channels**: Dedicated communication spaces for each collaboration
-
-### 🔗 Blockchain Integration
-- **Solana Wallet Support**: Seamless integration with popular Solana wallets
-- **Token Rewards System**: Earn tokens for completed tasks and successful collaborations
-- **Smart Contract Interaction**: Direct blockchain operations from the platform
-
-### 📊 Analytics & Insights
-- **Performance Metrics**: Comprehensive stats on projects, tasks, and collaborations
-- **Achievement System**: Gamified experience with unlockable rewards
-- **Activity Tracking**: Detailed analytics on user engagement and productivity
-
-## 🛠 Technology Stack
+## Tech Stack
 
 ### Frontend
-- **React 18** - Modern React with hooks and concurrent features
-- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
-- **Lucide React** - Beautiful, customizable icons
-- **Solana Wallet Adapter** - Seamless wallet integration
+- React 18
+- Tailwind CSS
+- Solana Wallet Adapter
+- Socket.IO Client
+- IBM Plex Mono font
 
 ### Backend
-- **Node.js & Express** - Scalable server architecture
-- **Socket.IO** - Real-time bidirectional communication
-- **OpenAI Integration** - Advanced AI capabilities
-- **AWS Services** - Cloud infrastructure and storage
+- Node.js with Express
+- Socket.IO for real-time communication
+- AWS SDK for cloud services
+- Solana Web3.js for blockchain operations
 
-### Blockchain
-- **Solana Web3.js** - Blockchain interaction and transaction handling
-- **SPL Token** - Token creation and management
-- **Metaplex** - NFT and metadata standards
+### Cloud Infrastructure
+- AWS DynamoDB for data storage
+- AWS Bedrock for AI services
+- AWS Lambda for serverless functions
+- AWS API Gateway for WebSocket connections
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
-- Node.js 18+ and npm 8+
+- Node.js 18+
+- AWS Account with configured credentials
 - Solana wallet (Phantom, Solflare, etc.)
-- Modern web browser with WebSocket support
 
-### Installation
+### Local Development
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-username/consilience.git
-   cd consilience
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   cd backend && npm install && cd ..
-   ```
-
-3. **Environment setup**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-4. **Start development servers**
-   ```bash
-   # Terminal 1 - Frontend
-   npm start
-   
-   # Terminal 2 - Backend
-   cd backend && npm run dev
-   ```
-
-5. **Open your browser**
-   Navigate to `http://localhost:3000` and connect your Solana wallet
-
-## 🏗 Architecture
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   React Frontend │    │  Node.js Backend │    │  Solana Blockchain │
-│                 │    │                 │    │                 │
-│ • Modern UI     │◄──►│ • REST API      │◄──►│ • Smart Contracts│
-│ • Real-time Chat│    │ • WebSocket     │    │ • Token Rewards  │
-│ • Wallet Connect│    │ • AI Integration│    │ • NFT Support    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 │
-                    ┌─────────────────┐
-                    │   AWS Services   │
-                    │                 │
-                    │ • DynamoDB      │
-                    │ • Lambda        │
-                    │ • API Gateway   │
-                    └─────────────────┘
+1. **Clone and Install Dependencies**
+```bash
+git clone <repository-url>
+cd consilience
+npm install
+cd backend && npm install && cd ..
 ```
 
-## 🎯 Core Components
+2. **Environment Setup**
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
 
-### Header Component
-- **Responsive Design**: Adapts to all screen sizes
-- **Real-time Status**: Shows online users and active projects
-- **Wallet Integration**: Seamless connection and user identification
+3. **Start Development Servers**
+```bash
+# Terminal 1 - Frontend
+npm start
 
-### Chat Interface
-- **Modern Message Design**: Clean, professional message bubbles
-- **AI Command System**: Powerful `/ai` commands for intelligent assistance
-- **Typing Indicators**: Real-time feedback on user activity
-- **Message Formatting**: Rich text support with markdown-like syntax
+# Terminal 2 - Backend
+cd backend && npm run dev
+```
 
-### Project Panel
-- **Visual Project Cards**: Beautiful, informative project displays
-- **Smart Filtering**: Advanced search and categorization
-- **Team Management**: Easy member addition and role assignment
-- **Status Tracking**: Real-time project status updates
+4. **Using Docker (Alternative)**
+```bash
+docker-compose up
+```
 
-### Task Manager
-- **Kanban-style Interface**: Intuitive task organization
-- **Priority System**: Color-coded priority levels
-- **Skill Matching**: Tasks matched to user capabilities
-- **Progress Analytics**: Detailed completion metrics
+### AWS Deployment
 
-### Stats Panel
-- **Performance Dashboard**: Comprehensive user analytics
-- **Achievement System**: Gamified progress tracking
-- **Activity Visualization**: Beautiful charts and graphs
-- **Export Capabilities**: Data export for external analysis
+1. **Install Serverless Framework**
+```bash
+npm install -g serverless
+```
 
-## 🔧 Configuration
+2. **Configure AWS Credentials**
+```bash
+aws configure
+```
+
+3. **Deploy Backend**
+```bash
+serverless deploy
+```
+
+4. **Deploy Frontend**
+```bash
+npm run build
+# Deploy to S3 + CloudFront or your preferred hosting
+```
+
+## Configuration
 
 ### Environment Variables
 
 #### Frontend (.env)
-```env
+```
 REACT_APP_SOLANA_RPC_URL=https://api.devnet.solana.com
-REACT_APP_SOLANA_NETWORK=devnet
-REACT_APP_API_URL=https://your-backend-url/api
-REACT_APP_WEBSOCKET_URL=wss://your-backend-url
+REACT_APP_API_URL=https://your-api-gateway-url
+REACT_APP_WEBSOCKET_URL=wss://your-websocket-url
 ```
 
 #### Backend
-```env
-NODE_ENV=production
-PORT=3001
-OPENAI_API_KEY=your_openai_api_key
-SOLANA_RPC_URL=https://api.devnet.solana.com
-CORS_ORIGIN=https://your-frontend-url
+```
 AWS_REGION=us-east-1
 DYNAMODB_USERS_TABLE=consilience-users
 DYNAMODB_PROJECTS_TABLE=consilience-projects
+DYNAMODB_CHATS_TABLE=consilience-chats
+BEDROCK_MODEL_ID=anthropic.claude-v2
+SOLANA_RPC_URL=https://api.devnet.solana.com
 ```
 
-## 🚀 Deployment
+## Database Schema
 
-### Option 1: One-Click Deploy
-
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/your-username/consilience)
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/consilience)
-
-### Option 2: Manual Deployment
-
-#### Frontend (Netlify/Vercel)
-```bash
-npm run build
-netlify deploy --prod --dir=build
-# or
-vercel --prod
+### Users Table (DynamoDB)
+```json
+{
+  "walletAddress": "string (PK)",
+  "skills": ["array of strings"],
+  "interests": ["array of strings"],
+  "experience": "string",
+  "projects": ["array of project IDs"],
+  "tokensEarned": "number",
+  "createdAt": "ISO string",
+  "lastActive": "ISO string"
+}
 ```
 
-#### Backend (Railway/Heroku)
-```bash
-# Railway
-railway login
-railway up
-
-# Heroku
-heroku create consilience-backend
-git push heroku main
+### Projects Table (DynamoDB)
+```json
+{
+  "projectId": "string (PK)",
+  "name": "string",
+  "description": "string",
+  "creatorWallet": "string (GSI)",
+  "teamMembers": ["array of wallet addresses"],
+  "status": "string",
+  "tasks": ["array of task objects"],
+  "tokenAllocations": "object",
+  "createdAt": "ISO string"
+}
 ```
 
-### Option 3: Docker Deployment
-```bash
-docker-compose up -d
+## API Endpoints
+
+### AI Routes
+- `POST /api/ai/chat` - Process chat messages
+- `POST /api/ai/match-team` - Find team members
+
+### User Routes
+- `GET /api/users/:walletAddress` - Get user profile
+- `POST /api/users` - Create/update profile
+- `POST /api/users/:walletAddress/activity` - Log activity
+
+### Project Routes
+- `GET /api/projects/user/:walletAddress` - Get user projects
+- `POST /api/projects` - Create new project
+- `POST /api/projects/:projectId/tasks` - Add task
+- `POST /api/projects/:projectId/tasks/:taskId/complete` - Complete task
+
+### Blockchain Routes
+- `GET /api/blockchain/wallet/:address` - Get wallet info
+- `POST /api/blockchain/mint-tokens` - Mint project tokens
+- `POST /api/blockchain/transfer-tokens` - Transfer tokens
+
+## Usage
+
+1. **Connect Wallet**: Click the wallet button to connect your Solana wallet
+2. **Chat with AI**: Type messages in the terminal to interact with the AI agent
+3. **Available Commands**:
+   - `HELP` - Show available commands
+   - `BALANCE` - Check wallet balance
+   - `PROJECT` - Start new project or view recommendations
+   - `TEAM` - Find team members
+   - `STATUS` - View current project status
+
+## Security Considerations
+
+- All user authentication is wallet-based
+- Sensitive operations require wallet signatures
+- Data encryption in transit and at rest
+- GDPR/CCPA compliance for user data
+- Secure token minting and transfers
+
+## Deployment Architecture
+
+```
+Internet → CloudFront → S3 (Frontend)
+         ↓
+Internet → API Gateway → Lambda (Backend)
+         ↓
+         DynamoDB (Data Storage)
+         ↓
+         Bedrock (AI Services)
 ```
 
-## 🧪 Testing
-
-```bash
-# Run all tests
-npm test
-
-# Run tests with coverage
-npm test -- --coverage
-
-# Run specific test suite
-npm test -- --testNamePattern="ChatInterface"
-```
-
-## 📈 Performance
-
-- **Lighthouse Score**: 95+ across all metrics
-- **Bundle Size**: Optimized with code splitting
-- **Load Time**: < 2s initial load, < 500ms subsequent loads
-- **Real-time Latency**: < 100ms message delivery
-
-## 🔒 Security
-
-- **Wallet Security**: Non-custodial, client-side key management
-- **Data Encryption**: End-to-end encryption for sensitive data
-- **Rate Limiting**: API protection against abuse
-- **Input Validation**: Comprehensive sanitization and validation
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see LICENSE file for details
 
-## 🆘 Support
+## Support
 
-- **Documentation**: [docs.consilience.app](https://docs.consilience.app)
-- **Discord**: [Join our community](https://discord.gg/consilience)
-- **Email**: support@consilience.app
-- **Issues**: [GitHub Issues](https://github.com/your-username/consilience/issues)
-
-## 🗺 Roadmap
-
-### Q1 2024
-- [ ] Mobile app development
-- [ ] Advanced AI features
-- [ ] Multi-chain support
-
-### Q2 2024
-- [ ] DAO governance integration
-- [ ] Advanced analytics dashboard
-- [ ] Enterprise features
-
-### Q3 2024
-- [ ] AI-powered code review
-- [ ] Automated testing integration
-- [ ] Advanced project templates
-
----
-
-<div align="center">
-
-**Built with ❤️ by the CONSILIENCE team**
-
-[Website](https://consilience.app) • [Documentation](https://docs.consilience.app) • [Discord](https://discord.gg/consilience) • [Twitter](https://twitter.com/consilience_app)
-
-</div>
+For support, please open an issue in the GitHub repository or contact the development team.
